@@ -1522,7 +1522,7 @@ function LeafletMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<Map<number, L.CircleMarker>>(
-    new Map(),
+    new globalThis.Map(),
   );
 
   // Init map once
@@ -1538,7 +1538,18 @@ function LeafletMap({
       { attribution: "&copy; OpenStreetMap &copy; CARTO" },
     ).addTo(map);
     mapRef.current = map;
+
+    requestAnimationFrame(() => {
+      map.invalidateSize();
+    });
+
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    resizeObserver.observe(containerRef.current);
+
     return () => {
+      resizeObserver.disconnect();
       map.remove();
       mapRef.current = null;
       markersRef.current.clear();
@@ -1596,7 +1607,8 @@ function LeafletMap({
   return (
     <div
       ref={containerRef}
-      style={{ height: "100%", width: "100%" }}
+      className="absolute inset-0"
+      style={{ width: "100%" }}
     />
   );
 }
@@ -1617,9 +1629,9 @@ function MapsPage() {
   );
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full min-h-0">
       {/* Map container */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative min-h-[640px]">
         <LeafletMap
           filter={filter}
           selectedId={selected?.id ?? null}
@@ -2041,15 +2053,15 @@ function DataLaporanPage() {
           <div className="ml-auto flex gap-2">
             <button
               onClick={exportCSV}
-              className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg bg-secondary border border-border text-foreground hover:bg-muted transition-colors"
+              className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg bg-[#217346] border border-[#217346] text-white hover:opacity-90 transition-colors"
             >
-              <Download size={12} /> Excel (CSV)
+              <Download size={12} className="text-white" /> Excel (CSV)
             </button>
             <button
               onClick={exportPDF}
-              className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg bg-foreground border border-foreground text-background hover:opacity-80 transition-colors"
+              className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg bg-white border border-[#EC1C24] text-[#EC1C24] hover:bg-red-50 transition-colors"
             >
-              <Download size={12} /> PDF
+              <Download size={12} className="text-[#EC1C24]" /> PDF
             </button>
           </div>
         </div>
