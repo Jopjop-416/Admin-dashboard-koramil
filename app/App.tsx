@@ -995,11 +995,11 @@ function DataTable({ cols, rows }: { cols: ColDef[]; rows: KecamatanRow[] }) {
   const headerCount = cols.length + 1;
 
   return (
-    <div className="overflow-x-auto max-h-72">
+    <div className="overflow-auto max-h-[350px] pb-3">
       <table className="w-full text-xs">
         <thead className="sticky top-0 z-10 bg-card backdrop-blur-sm">
           <tr className="bg-card shadow-[inset_0_-1px_0_rgba(0,0,0,0.18)]">
-            <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-muted-foreground uppercase w-8 tracking-wider bg-card">
+            <th className="pl-5 pr-3 py-2.5 text-center text-[10px] font-semibold text-muted-foreground uppercase w-12 tracking-wider bg-card">
               No
             </th>
             {cols.map((c) => (
@@ -1019,10 +1019,10 @@ function DataTable({ cols, rows }: { cols: ColDef[]; rows: KecamatanRow[] }) {
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={row.id} className="border-b border-border/40 hover:bg-secondary/30 transition-colors">
-              <td className="px-3 py-2 text-[10px] text-muted-foreground font-sans">{i + 1}</td>
+            <tr key={row.id} className="border-b border-border/40 last:border-b-0 hover:bg-secondary/30 transition-colors">
+              <td className="pl-5 pr-3 py-2.5 text-[10px] text-center text-muted-foreground font-sans">{i + 1}</td>
               {cols.map((c) => (
-                <td key={c.key} className="px-3 py-2 font-sans text-[11px] text-foreground whitespace-nowrap">
+                <td key={c.key} className="px-3 py-2.5 font-sans text-[11px] text-foreground whitespace-nowrap">
                   {c.render ? c.render(row) : String((row as Record<string, unknown>)[c.key])}
                 </td>
               ))}
