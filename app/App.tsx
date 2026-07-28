@@ -160,6 +160,10 @@ function populationColor(pop: number): string {
   return "#93c5fd";
 }
 
+function normalizeSearch(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "").replace(/[aiueo]/g, "");
+}
+
 // ─── SIDEBAR ──────────────────────────────────────────────────────────────────
 
 type Page = "dashboard" | "maps" | "laporan";
@@ -347,8 +351,14 @@ function StatCard({
 
 function MiniMap({
   onSelect,
+  title = "Peta Kecamatan",
+  subtitle = "Klik untuk detail",
+  maxHeight = 280,
 }: {
   onSelect: (k: KecamatanRow) => void;
+  title?: string;
+  subtitle?: string;
+  maxHeight?: number;
 }) {
   const COLS = 8;
   const ROWS = 8;
@@ -370,12 +380,8 @@ function MiniMap({
     <div className="bg-card border border-border rounded-xl p-4 overflow-hidden">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <p className="text-xs font-semibold text-foreground">
-            Peta Kecamatan
-          </p>
-          <p className="text-[10px] text-muted-foreground">
-            Klik untuk detail
-          </p>
+          <p className="text-xs font-semibold text-foreground">{title}</p>
+          <p className="text-[10px] text-muted-foreground">{subtitle}</p>
         </div>
         <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
           <span className="flex items-center gap-1">
@@ -404,7 +410,7 @@ function MiniMap({
       <svg
         viewBox={`0 0 ${COLS * (CW + PAD) + PAD} ${ROWS * (CH + PAD) + PAD}`}
         className="w-full h-full"
-        style={{ maxHeight: 280 }}
+        style={{ maxHeight }}
       >
         {grid.map((row, ri) =>
           row.map((cell, ci) => {
@@ -844,13 +850,141 @@ function DonutRing({ pct, label, sublabel, color }: { pct: number; label: string
   );
 }
 
-function ThreeDonutCard({ title, sub, donuts }: { title: string; sub: string; donuts: { pct: number; label: string; sublabel: string; color: string }[] }) {
+function MetricRing({
+  value,
+  max,
+  label,
+  sublabel,
+  color,
+  display,
+  unit,
+}: {
+  value: number;
+  max: number;
+  label: string;
+  sublabel: string;
+  color: string;
+  display: string;
+  unit?: string;
+}) {
+  const r = 34;
+  const cx = 46;
+  const cy = 46;
+  const circ = 2 * Math.PI * r;
+  const safePct = Math.max(0, Math.min(100, (value / max) * 100));
+  const dash = (safePct / 100) * circ;
+
+  return (
+    <div className="flex flex-col items-center gap-1.5 flex-1 min-w-0">
+      <div className="relative shrink-0">
+        <svg width={92} height={92}>
+          <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f0f0f0" strokeWidth={10} />
+          <circle
+            cx={cx}
+            cy={cy}
+            r={r}
+            fill="none"
+            stroke={color}
+            strokeWidth={10}
+            strokeDasharray={dash + " " + circ}
+            strokeLinecap="round"
+            transform={"rotate(-90 " + cx + " " + cy + ")"}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+          <span className="text-[15px] font-bold text-foreground leading-none">{display}</span>
+          {unit && <span className="text-[9px] font-medium text-muted-foreground leading-none mt-0.5">{unit}</span>}
+        </div>
+      </div>
+      <p className="text-[11px] font-semibold text-center leading-tight text-foreground px-1">{label}</p>
+      <p className="text-[10px] text-muted-foreground text-center leading-tight px-1">{sublabel}</p>
+    </div>
+  );
+}
+
+function ThreeDonutCard({
+  title,
+  sub,
+  donuts,
+}: {
+  title: string;
+  sub: string;
+  donuts: { pct: number; label: string; sublabel: string; color: string }[];
+}) {
   return (
     <div className="bg-card border border-border rounded-xl p-5 flex flex-col">
       <p className="text-xs font-semibold text-foreground">{title}</p>
       <p className="text-[10px] text-muted-foreground mt-0.5 mb-5">{sub}</p>
       <div className="flex items-start justify-around gap-2 flex-1">
         {donuts.map((d, i) => <DonutRing key={i} {...d} />)}
+      </div>
+    </div>
+  );
+}
+
+function PopulationPieCard({
+  title,
+  sub,
+  data,
+}: {
+  title: string;
+  sub: string;
+  data: { name: string; value: number; color: string }[];
+}) {
+  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value }: any) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.58;
+    const x = cx + radius * Math.cos((-midAngle * Math.PI) / 180);
+    const y = cy + radius * Math.sin((-midAngle * Math.PI) / 180);
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="#fff"
+        textAnchor="middle"
+        dominantBaseline="central"
+        className="text-[13px] font-bold"
+      >
+        {value}%
+      </text>
+    );
+  };
+
+  return (
+    <div className="bg-card border border-border rounded-xl p-5 flex flex-col">
+      <p className="text-xs font-semibold text-foreground">{title}</p>
+      <p className="text-[10px] text-muted-foreground mt-0.5 mb-3">{sub}</p>
+      <div className="h-[230px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              dataKey="value"
+              startAngle={90}
+              endAngle={-270}
+              outerRadius={92}
+              paddingAngle={4}
+              stroke="#fff"
+              strokeWidth={8}
+              labelLine={false}
+              label={renderLabel}
+            >
+              {data.map((item) => (
+                <Cell key={item.name} fill={item.color} />
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="mt-2 grid grid-cols-3 gap-2">
+        {data.map((item) => (
+          <div key={item.name} className="flex items-center gap-1.5 min-w-0">
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: item.color }} />
+            <span className="truncate text-[10px] font-medium text-muted-foreground">{item.name}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -901,19 +1035,43 @@ function DataTable({ cols, rows }: { cols: ColDef[]; rows: KecamatanRow[] }) {
 
 // ─── POPULATION ANALYTICS ─────────────────────────────────────────────────────
 
-function PopulationAnalytics({ D, scaleFactor }: { D: KecamatanRow[]; scaleFactor: number }) {
-  const n = D.length || 1;
-  const totalPop    = D.reduce((s, k) => s + k.population, 0);
-  const totalMale   = D.reduce((s, k) => s + k.male, 0);
-  const totalFemale = D.reduce((s, k) => s + k.female, 0);
+function PopulationAnalytics({
+  D,
+  scaleFactor,
+  onDistrict,
+  selectedDistrict,
+  onClearFocus,
+}: {
+  D: KecamatanRow[];
+  scaleFactor: number;
+  onDistrict: (k: KecamatanRow) => void;
+  selectedDistrict: KecamatanRow | null;
+  onClearFocus: () => void;
+}) {
+  const activeRows = selectedDistrict ? [selectedDistrict] : D;
+  const n = activeRows.length || 1;
+  const totalPop    = activeRows.reduce((s, k) => s + k.population, 0);
+  const totalMale   = activeRows.reduce((s, k) => s + k.male, 0);
+  const totalFemale = activeRows.reduce((s, k) => s + k.female, 0);
+  const totalArea   = activeRows.reduce((s, k) => s + k.area, 0);
+  const totalVillages = activeRows.reduce((s, k) => s + k.villages, 0);
+  const totalHamlets  = activeRows.reduce((s, k) => s + k.hamlets, 0);
+  const totalRoad     = activeRows.reduce((s, k) => s + k.roadLength, 0);
+  const totalSchools  = activeRows.reduce((s, k) => s + k.schoolCount, 0);
+  const totalHealth   = activeRows.reduce((s, k) => s + k.healthFacility, 0);
+  const avgLiteracy   = (activeRows.reduce((s, k) => s + k.literacy, 0) / n).toFixed(1);
+  const avgPdrb       = Math.round(activeRows.reduce((s, k) => s + k.pdrb, 0) / n);
 
   const pctProduktif = 66;
   const pctPerempuan = totalPop > 0 ? Math.round((totalFemale / totalPop) * 100) : 51;
-  const pctGrowthPos = Math.round((D.filter((k) => k.growth >= 1.5).length / n) * 100);
+  const pctGrowthPos = Math.round((activeRows.filter((k) => k.growth >= 1.5).length / n) * 100);
 
-  const scaledTrend = populationTrend.map((r) => ({ ...r, penduduk: Math.round(r.penduduk * scaleFactor) }));
-  const scaledVital = monthlyData.map((r) => ({ ...r, kelahiran: Math.round(r.kelahiran * scaleFactor), kematian: Math.round(r.kematian * scaleFactor) }));
-  const top5 = [...D].sort((a, b) => b.population - a.population).slice(0, 5);
+  const trendScaleFactor = selectedDistrict
+    ? selectedDistrict.population / 1293040
+    : scaleFactor;
+  const scaledTrend = populationTrend.map((r) => ({ ...r, penduduk: Math.round(r.penduduk * trendScaleFactor) }));
+  const scaledVital = monthlyData.map((r) => ({ ...r, kelahiran: Math.round(r.kelahiran * trendScaleFactor), kematian: Math.round(r.kematian * trendScaleFactor) }));
+  const top5 = [...activeRows].sort((a, b) => b.population - a.population).slice(0, 5);
   const trendData = buildDistrictTrend(top5);
 
   const popCols: ColDef[] = [
@@ -928,38 +1086,227 @@ function PopulationAnalytics({ D, scaleFactor }: { D: KecamatanRow[]; scaleFacto
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-        <ThreeDonutCard
-          title="Komposisi Kependudukan"
-          sub="Tiga indikator demografis utama"
-          donuts={[
-            { pct: pctProduktif, label: "Usia Produktif", sublabel: "15–64 tahun dari total", color: "#3b82f6" },
-            { pct: pctPerempuan, label: "Perempuan",       sublabel: "% dari total penduduk", color: "#ec4899" },
-            { pct: pctGrowthPos, label: "Laju Positif",    sublabel: "Kec. tumbuh ≥ 1.5%/thn", color: "#10b981" },
-          ]}
-        />
-        <div className="xl:col-span-2 bg-card border border-border rounded-xl p-4">
-          <p className="text-xs font-semibold text-foreground">Tren Populasi Kabupaten 2019–2024</p>
-          <p className="text-[10px] text-muted-foreground mb-3">Total jiwa terdaftar per tahun</p>
-          <ResponsiveContainer width="100%" height={195}>
-            <AreaChart data={scaledTrend}>
-              <defs>
-                <linearGradient id="popG" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.18} />
-                  <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
-              <XAxis dataKey="year" tick={{ fontSize: 10, fill: "#888" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "#888" }} axisLine={false} tickLine={false} tickFormatter={fmtK} />
-              <Tooltip content={<ChartTooltip />} />
-              <Area type="monotone" dataKey="penduduk" name="Penduduk" stroke="#3b82f6" strokeWidth={2.5} fill="url(#popG)" dot={{ r: 3, fill: "#3b82f6" }} />
-            </AreaChart>
-          </ResponsiveContainer>
+      {selectedDistrict && (
+        <div className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3">
+          <div>
+            <p className="text-xs font-semibold text-foreground">
+              Fokus wilayah: {selectedDistrict.name}
+            </p>
+            <p className="text-[10px] text-muted-foreground">
+              Grafik di bawah mengikuti wilayah yang dipilih dari peta
+            </p>
+          </div>
+          <button
+            onClick={onClearFocus}
+            className="text-[11px] font-medium px-3 py-1.5 rounded-lg border border-border bg-secondary hover:bg-secondary/80 transition-colors"
+          >
+            Tampilkan semua
+          </button>
         </div>
-      </div>
+      )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 items-start">
+        <div className="space-y-5">
+          <ThreeDonutCard
+            title="Komposisi Kependudukan"
+            sub="Tiga indikator demografis utama"
+            donuts={[
+              { pct: pctProduktif, label: "Usia Produktif", sublabel: "15–64 tahun dari total", color: "#3b82f6" },
+              { pct: pctPerempuan, label: "Perempuan", sublabel: "% dari total penduduk", color: "#ec4899" },
+              { pct: pctGrowthPos, label: "Laju Positif", sublabel: "Kec. tumbuh ≥ 1.5%/thn", color: "#10b981" },
+            ]}
+          />
+
+          <div className="bg-card border border-border rounded-xl p-5">
+            <p className="text-xs font-semibold text-foreground">Statistik Wilayah</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5 mb-4">
+              {selectedDistrict ? `Ringkasan Kecamatan ${selectedDistrict.name}` : "Ringkasan seluruh kecamatan"}
+            </p>
+            <div className="space-y-4">
+              <div className="rounded-lg border border-blue-100 bg-blue-50 p-4">
+                <div className="flex items-end justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-semibold text-blue-700">Luas Wilayah</p>
+                    <p className="mt-1 text-2xl font-medium leading-none text-slate-900">
+                      {totalArea.toFixed(selectedDistrict ? 1 : 0)}
+                      <span className="ml-1 text-xs font-normal text-slate-900">km2</span>
+                    </p>
+                  </div>
+                  <div className="flex h-12 items-end gap-1">
+                    <span className="w-2.5 rounded-t bg-blue-300" style={{ height: `${Math.max(18, Math.min(100, totalVillages / (selectedDistrict ? 18 : 260) * 100))}%` }} />
+                    <span className="w-2.5 rounded-t bg-blue-500" style={{ height: `${Math.max(18, Math.min(100, totalHamlets / (selectedDistrict ? 60 : 900) * 100))}%` }} />
+                    <span className="w-2.5 rounded-t bg-blue-700" style={{ height: `${Math.max(18, Math.min(100, totalRoad / (selectedDistrict ? 100 : 1200) * 100))}%` }} />
+                  </div>
+                </div>
+              </div>
+
+              {[
+                { label: "Desa/Kel.", value: fmt(totalVillages), note: "unit administrasi", pct: Math.min(100, totalVillages / (selectedDistrict ? 18 : 260) * 100), color: "#f59e0b" },
+                { label: "Dusun", value: fmt(totalHamlets), note: "sebaran permukiman", pct: Math.min(100, totalHamlets / (selectedDistrict ? 60 : 900) * 100), color: "#14b8a6" },
+                { label: "Panjang Jalan", value: `${fmt(totalRoad)} km`, note: "akses wilayah", pct: Math.min(100, totalRoad / (selectedDistrict ? 100 : 1200) * 100), color: "#0ea5e9" },
+              ].map((item) => (
+                <div key={item.label}>
+                  <div className="mb-1.5 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[11px] font-semibold text-foreground">{item.label}</p>
+                      <p className="text-[10px] text-muted-foreground">{item.note}</p>
+                    </div>
+                    <p className="text-xs font-normal text-foreground">{item.value}</p>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
+                    <div className="h-full rounded-full" style={{ width: `${Math.max(8, item.pct)}%`, backgroundColor: item.color }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="hidden">
+              <div className="absolute inset-x-0 top-2 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+              <div className="absolute left-1/2 top-[98px] h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500 text-white shadow-lg shadow-blue-500/25 flex flex-col items-center justify-center">
+                <span className="text-[21px] font-bold leading-none">{totalArea.toFixed(selectedDistrict ? 1 : 0)}</span>
+                <span className="text-[10px] font-semibold mt-1">km2 wilayah</span>
+              </div>
+              <div className="absolute left-0 top-9 h-[86px] w-[86px] rounded-full bg-amber-400 text-amber-950 shadow-sm flex flex-col items-center justify-center">
+                <span className="text-lg font-bold leading-none">{fmt(totalVillages)}</span>
+                <span className="text-[10px] font-semibold mt-1">desa/kel.</span>
+              </div>
+              <div className="absolute right-2 top-8 h-[78px] w-[78px] rounded-full bg-teal-500 text-white shadow-sm flex flex-col items-center justify-center">
+                <span className="text-lg font-bold leading-none">{fmt(totalHamlets)}</span>
+                <span className="text-[10px] font-semibold mt-1">dusun</span>
+              </div>
+              <div className="absolute bottom-9 left-8 h-[74px] w-[74px] rounded-full bg-sky-500 text-white shadow-sm flex flex-col items-center justify-center">
+                <span className="text-base font-bold leading-none">{fmt(totalRoad)}</span>
+                <span className="text-[10px] font-semibold mt-1">km jalan</span>
+              </div>
+              <div className="absolute bottom-7 right-0 w-[132px]">
+                <div className="flex items-end gap-1.5 h-16">
+                  <span className="w-5 rounded-t bg-amber-400" style={{ height: `${Math.max(20, Math.min(100, totalVillages / (selectedDistrict ? 18 : 260) * 100))}%` }} />
+                  <span className="w-5 rounded-t bg-teal-500" style={{ height: `${Math.max(20, Math.min(100, totalHamlets / (selectedDistrict ? 60 : 900) * 100))}%` }} />
+                  <span className="w-5 rounded-t bg-sky-500" style={{ height: `${Math.max(20, Math.min(100, totalRoad / (selectedDistrict ? 100 : 1200) * 100))}%` }} />
+                </div>
+                <p className="mt-2 text-[10px] leading-tight text-muted-foreground">Rasio desa, dusun, dan jalan pada wilayah aktif</p>
+              </div>
+            </div>
+            <div className="hidden">
+              <MetricRing
+                value={totalArea}
+                max={100}
+                display={totalArea.toFixed(selectedDistrict ? 2 : 0)}
+                unit="km²"
+                label="Luas Wilayah"
+                sublabel="Luas area yang aktif"
+                color="#3b82f6"
+              />
+              <MetricRing
+                value={totalVillages}
+                max={20}
+                display={fmt(totalVillages)}
+                unit="desa"
+                label="Desa/Kel."
+                sublabel="Unit administrasi aktif"
+                color="#14b8a6"
+              />
+              <MetricRing
+                value={totalHamlets}
+                max={60}
+                display={fmt(totalHamlets)}
+                unit="dusun"
+                label="Dusun"
+                sublabel="Sebaran permukiman"
+                color="#0ea5e9"
+              />
+              <MetricRing
+                value={totalRoad}
+                max={100}
+                display={fmt(totalRoad)}
+                unit="km"
+                label="Panjang Jalan"
+                sublabel="Jaringan jalan wilayah"
+                color="#8b5cf6"
+              />
+            </div>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-5">
+            <p className="text-xs font-semibold text-foreground">Indikator Layanan</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5 mb-4">
+              Pendidikan, kesehatan, dan ekonomi wilayah
+            </p>
+              <div className="space-y-3">
+              {[
+                { label: "Sekolah", value: fmt(totalSchools), note: "fasilitas", pct: Math.min(100, totalSchools / (selectedDistrict ? 50 : 760) * 100), color: "#10b981" },
+                { label: "Faskes", value: fmt(totalHealth), note: "layanan", pct: Math.min(100, totalHealth / (selectedDistrict ? 10 : 130) * 100), color: "#f43f5e" },
+                { label: "Melek Huruf", value: `${avgLiteracy}%`, note: "literasi", pct: Number(avgLiteracy), color: "#14b8a6" },
+                { label: "PDRB/Kapita", value: `Rp ${(avgPdrb / 1000).toFixed(2)} jt`, note: "ekonomi", pct: Math.min(100, (avgPdrb / 20000) * 100), color: "#f59e0b" },
+              ].map((item) => (
+                <div key={item.label}>
+                  <div className="mb-1 flex items-end justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-semibold text-foreground leading-tight">{item.label}</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight">{item.note}</p>
+                    </div>
+                    <p className="text-[11px] font-normal text-foreground whitespace-nowrap">{item.value}</p>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${Math.max(8, item.pct)}%`, backgroundColor: item.color }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="hidden">
+              <MetricRing
+                value={totalSchools}
+                max={50}
+                display={fmt(totalSchools)}
+                unit="sekolah"
+                label="Sekolah"
+                sublabel="Fasilitas pendidikan"
+                color="#10b981"
+              />
+              <MetricRing
+                value={totalHealth}
+                max={10}
+                display={fmt(totalHealth)}
+                unit="faskes"
+                label="Faskes"
+                sublabel="Layanan kesehatan"
+                color="#f43f5e"
+              />
+              <MetricRing
+                value={Number(avgLiteracy)}
+                max={100}
+                display={avgLiteracy}
+                unit="%"
+                label="Melek Huruf"
+                sublabel="Persentase literasi"
+                color="#4876ecff"
+              />
+              <MetricRing
+                value={avgPdrb / 1000}
+                max={20}
+                display={(avgPdrb / 1000).toFixed(2)}
+                unit="jt"
+                label="PDRB/Kapita"
+                sublabel="Rata-rata per kapita"
+                color="#f59e0b"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="xl:col-span-2 space-y-5">
+        <PopulationBubbleMap
+          selectedId={selectedDistrict?.id ?? null}
+          onSelect={(k) => {
+            onDistrict(k);
+          }}
+          onClearFocus={() => {
+            onClearFocus();
+          }}
+          height={360}
+        />
+
         <div className="bg-card border border-border rounded-xl p-4">
           <p className="text-xs font-semibold text-foreground">Perbandingan 5 Kecamatan Terpadat 2020–2024</p>
           <p className="text-[10px] text-muted-foreground mb-2">Tren populasi multi-kecamatan</p>
@@ -1002,6 +1349,7 @@ function PopulationAnalytics({ D, scaleFactor }: { D: KecamatanRow[]; scaleFacto
             </BarChart>
           </ResponsiveContainer>
         </div>
+      </div>
       </div>
 
       <div className="bg-card border border-border rounded-xl overflow-hidden">
@@ -1359,44 +1707,77 @@ const CATEGORY_LABELS: Record<Category, string> = {
 function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }) {
   const [category, setCategory] = useState<Category>("penduduk");
   const [search, setSearch]     = useState("");
+  const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
 
   const filteredKec = useMemo(
-    () => search.trim()
-      ? kecamatan.filter((k) => k.name.toLowerCase().includes(search.toLowerCase()))
-      : kecamatan,
+    () => {
+      const q = search.trim().toLowerCase();
+      const normalizedQ = normalizeSearch(search);
+      if (!q) return kecamatan;
+
+      return kecamatan.filter((k) => {
+        const name = k.name.toLowerCase();
+        return name.includes(q) || (!!normalizedQ && normalizeSearch(k.name).includes(normalizedQ));
+      });
+    },
     [search],
   );
 
-  const D = filteredKec;
-  const n = D.length || 1;
+  const selectedDistrict = useMemo(
+    () => kecamatan.find((k) => k.id === selectedDistrictId) ?? null,
+    [selectedDistrictId],
+  );
 
-  const totalPop       = D.reduce((s, k) => s + k.population, 0);
-  const totalMale      = D.reduce((s, k) => s + k.male, 0);
-  const totalFemale    = D.reduce((s, k) => s + k.female, 0);
-  const totalArea      = D.reduce((s, k) => s + k.area, 0);
-  const totalVillages  = D.reduce((s, k) => s + k.villages, 0);
-  const totalHH        = D.reduce((s, k) => s + k.households, 0);
-  const totalSchools   = D.reduce((s, k) => s + k.schoolCount, 0);
-  const totalHealth    = D.reduce((s, k) => s + k.healthFacility, 0);
-  const totalPostyandu = D.reduce((s, k) => s + k.posyandu, 0);
-  const totalWorship   = D.reduce((s, k) => s + k.worshipPlace, 0);
-  const totalIndustry  = D.reduce((s, k) => s + k.industry, 0);
-  const totalMarkets   = D.reduce((s, k) => s + k.markets, 0);
-  const totalCoops     = D.reduce((s, k) => s + k.cooperatives, 0);
-  const totalHamlets   = D.reduce((s, k) => s + k.hamlets, 0);
-  const totalRoad      = D.reduce((s, k) => s + k.roadLength, 0);
+  useEffect(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) {
+      setSelectedDistrictId(null);
+      return;
+    }
+
+    const normalizedQ = normalizeSearch(search);
+    const exact = kecamatan.find(
+      (k) => k.name.toLowerCase() === q || (!!normalizedQ && normalizeSearch(k.name) === normalizedQ),
+    );
+    const matches = kecamatan.filter((k) =>
+      k.name.toLowerCase().includes(q) || (!!normalizedQ && normalizeSearch(k.name).includes(normalizedQ)),
+    );
+    const next = exact ?? (matches.length === 1 ? matches[0] : null);
+
+    setSelectedDistrictId((prev) => (next ? next.id : prev === null ? prev : null));
+  }, [search]);
+
+  const D = filteredKec;
+  const statRows = selectedDistrict ? [selectedDistrict] : filteredKec;
+  const n = statRows.length || 1;
+
+  const totalPop       = statRows.reduce((s, k) => s + k.population, 0);
+  const totalMale      = statRows.reduce((s, k) => s + k.male, 0);
+  const totalFemale    = statRows.reduce((s, k) => s + k.female, 0);
+  const totalArea      = statRows.reduce((s, k) => s + k.area, 0);
+  const totalVillages  = statRows.reduce((s, k) => s + k.villages, 0);
+  const totalHH        = statRows.reduce((s, k) => s + k.households, 0);
+  const totalSchools   = statRows.reduce((s, k) => s + k.schoolCount, 0);
+  const totalHealth    = statRows.reduce((s, k) => s + k.healthFacility, 0);
+  const totalPostyandu = statRows.reduce((s, k) => s + k.posyandu, 0);
+  const totalWorship   = statRows.reduce((s, k) => s + k.worshipPlace, 0);
+  const totalIndustry  = statRows.reduce((s, k) => s + k.industry, 0);
+  const totalMarkets   = statRows.reduce((s, k) => s + k.markets, 0);
+  const totalCoops     = statRows.reduce((s, k) => s + k.cooperatives, 0);
+  const totalHamlets   = statRows.reduce((s, k) => s + k.hamlets, 0);
+  const totalRoad      = statRows.reduce((s, k) => s + k.roadLength, 0);
 
   const avgDensity  = totalArea > 0 ? Math.round(totalPop / totalArea) : 0;
-  const avgLiteracy = (D.reduce((s, k) => s + k.literacy, 0) / n).toFixed(1);
-  const avgUnemp    = (D.reduce((s, k) => s + k.unemployment, 0) / n).toFixed(1);
-  const avgGrowth   = (D.reduce((s, k) => s + k.growth, 0) / n).toFixed(1);
-  const avgSchool   = (D.reduce((s, k) => s + k.avgSchooling, 0) / n).toFixed(1);
-  const avgPdrb     = Math.round(D.reduce((s, k) => s + k.pdrb, 0) / n);
-  const avgAps      = (D.reduce((s, k) => s + k.aps, 0) / n).toFixed(1);
-  const avgElev     = Math.round(D.reduce((s, k) => s + k.elevation, 0) / n);
-  const avgSawah    = (D.reduce((s, k) => s + k.sawahPct, 0) / n).toFixed(1);
+  const avgLiteracy = (statRows.reduce((s, k) => s + k.literacy, 0) / n).toFixed(1);
+  const avgUnemp    = (statRows.reduce((s, k) => s + k.unemployment, 0) / n).toFixed(1);
+  const avgGrowth   = (statRows.reduce((s, k) => s + k.growth, 0) / n).toFixed(1);
+  const avgSchool   = (statRows.reduce((s, k) => s + k.avgSchooling, 0) / n).toFixed(1);
+  const avgPdrb     = Math.round(statRows.reduce((s, k) => s + k.pdrb, 0) / n);
+  const avgAps      = (statRows.reduce((s, k) => s + k.aps, 0) / n).toFixed(1);
+  const avgElev     = Math.round(statRows.reduce((s, k) => s + k.elevation, 0) / n);
+  const avgSawah    = (statRows.reduce((s, k) => s + k.sawahPct, 0) / n).toFixed(1);
   const sexRatio    = totalFemale > 0 ? (totalMale / totalFemale * 100).toFixed(1) : "0";
-  const scaleFactor = D.length === 1 ? D[0].population / 1293040 : 1;
+  const scaleFactor = statRows.length === 1 ? statRows[0].population / 1293040 : 1;
 
   type CardDef = { icon: React.ReactNode; label: string; value: string; sub: string; color: string; iconColor: string; trend?: number };
 
@@ -1417,7 +1798,7 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }
       { icon: <MapPin size={17} />,     label: "Jumlah Dusun",           value: String(totalHamlets),                      sub: "Dusun/lingkungan",                   color: "bg-sky-50",    iconColor: "text-sky-600"    },
       { icon: <Activity size={17} />,   label: "Panjang Jalan",          value: totalRoad.toFixed(0) + " km",              sub: "Total jaringan jalan",               color: "bg-blue-50",   iconColor: "text-blue-600"   },
       { icon: <Layers size={17} />,     label: "Ketinggian Rata-rata",   value: avgElev + " mdpl",                         sub: "Di atas permukaan laut",             color: "bg-violet-50", iconColor: "text-violet-600" },
-      { icon: <MapPin size={17} />,     label: "Jumlah Kecamatan",       value: String(D.length),                          sub: "Wilayah kecamatan aktif",            color: "bg-amber-50",  iconColor: "text-amber-600"  },
+      { icon: <MapPin size={17} />,     label: "Jumlah Kecamatan",       value: String(statRows.length),                   sub: "Wilayah kecamatan aktif",            color: "bg-amber-50",  iconColor: "text-amber-600"  },
       { icon: <Building2 size={17} />,  label: "% Lahan Sawah",          value: avgSawah + "%",                            sub: "Rata-rata dari total lahan",         color: "bg-lime-50",   iconColor: "text-lime-600"   },
       { icon: <Activity size={17} />,   label: "Kepadatan Penduduk",     value: fmt(avgDensity) + "/km²",             sub: "Jiwa per km persegi",                color: "bg-rose-50",   iconColor: "text-rose-500"   },
     ],
@@ -1497,13 +1878,24 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }
       {/* Analytics section divider */}
 
       {/* Per-category rich analytics */}
-      {category === "penduduk"  && <PopulationAnalytics D={D} scaleFactor={scaleFactor} />}
+      {category === "penduduk"  && (
+        <PopulationAnalytics
+          D={D}
+          scaleFactor={scaleFactor}
+          onDistrict={(k) => {
+            setSelectedDistrictId(k.id);
+            setSearch(k.name);
+          }}
+          selectedDistrict={selectedDistrict}
+          onClearFocus={() => {
+            setSelectedDistrictId(null);
+            setSearch("");
+          }}
+        />
+      )}
       {category === "geografis" && <GeografisAnalytics  D={D} />}
       {category === "ekonomi"   && <EkonomiAnalytics    D={D} />}
       {category === "sosial"    && <SosialAnalytics     D={D} />}
-
-      {/* Mini Map at bottom */}
-      <MiniMap onSelect={onDistrict} />
     </div>
   );
 }
@@ -1610,6 +2002,151 @@ function LeafletMap({
       className="absolute inset-0"
       style={{ width: "100%" }}
     />
+  );
+}
+
+function PopulationBubbleMap({
+  selectedId = null,
+  onSelect,
+  onClearFocus,
+  height = 380,
+}: {
+  selectedId?: number | null;
+  onSelect: (k: KecamatanRow) => void;
+  onClearFocus: () => void;
+  height?: number;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<Map<number, L.CircleMarker>>(new globalThis.Map());
+  const hasFitRef = useRef(false);
+  const lastSelectedRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!containerRef.current || mapRef.current) return;
+
+    const map = L.map(containerRef.current, {
+      center: [-8.56, 116.53],
+      zoom: 10.2,
+      zoomControl: true,
+      scrollWheelZoom: true,
+    });
+
+    L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      {
+        attribution: "&copy; OpenStreetMap &copy; CARTO",
+      },
+    ).addTo(map);
+
+    mapRef.current = map;
+
+    requestAnimationFrame(() => {
+      map.invalidateSize();
+    });
+
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    resizeObserver.observe(containerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+      map.remove();
+      mapRef.current = null;
+      markersRef.current.clear();
+    };
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    markersRef.current.forEach((m) => m.remove());
+    markersRef.current.clear();
+
+    const bounds = L.latLngBounds([]);
+    const visible = [...kecamatan].sort((a, b) => a.population - b.population);
+
+    visible.forEach((k) => {
+      const isSelected = selectedId === k.id;
+      const radius = Math.max(9, Math.min(28, k.population / 2900));
+      const circle = L.circleMarker([k.lat, k.lng], {
+        radius: isSelected ? radius + 5 : radius,
+        fillColor: populationColor(k.population),
+        fillOpacity: isSelected ? 0.92 : 0.6,
+        color: isSelected ? "#1d4ed8" : "#2563eb",
+        weight: isSelected ? 3 : 1.5,
+        opacity: 0.9,
+      }).addTo(map);
+
+      circle.bindTooltip(
+        `<strong>${k.name}</strong><br/>${fmt(k.population)} jiwa`,
+        {
+          direction: "top",
+          sticky: true,
+          opacity: 0.95,
+        },
+      );
+
+      circle.on("click", () => onSelect(k));
+      markersRef.current.set(k.id, circle);
+      bounds.extend([k.lat, k.lng]);
+    });
+
+    const selected = selectedId
+      ? kecamatan.find((k) => k.id === selectedId) ?? null
+      : null;
+
+    if (selected) {
+      map.flyTo([selected.lat, selected.lng], Math.max(map.getZoom(), 12.4), {
+        animate: true,
+        duration: 0.75,
+      });
+    } else if (bounds.isValid() && (!hasFitRef.current || lastSelectedRef.current !== null)) {
+      map.fitBounds(bounds.pad(0.18), { animate: true });
+      hasFitRef.current = true;
+    }
+
+    lastSelectedRef.current = selectedId;
+  }, [selectedId, onSelect]);
+
+  const selectedLabel = selectedId
+    ? kecamatan.find((k) => k.id === selectedId)?.name
+    : null;
+
+  return (
+    <div className="relative overflow-hidden rounded-xl border border-border bg-[#eef2f7]">
+      <div className="pointer-events-none absolute top-4 left-4 z-[1000] rounded-xl border border-border bg-card/90 px-3 py-2 shadow-lg backdrop-blur-sm">
+        <p className="text-xs font-semibold text-foreground">Peta Wilayah Kecamatan</p>
+        <p className="text-[10px] text-muted-foreground">Klik titik biru untuk zoom dan ubah grafik</p>
+      </div>
+
+      <div className="pointer-events-none absolute top-4 right-4 z-[1000] rounded-xl border border-border bg-card/90 px-3 py-2 shadow-lg backdrop-blur-sm">
+        <p className="text-[10px] font-semibold text-foreground mb-1">Legenda Penduduk</p>
+        <div className="space-y-1 text-[10px] text-muted-foreground">
+          <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-[#1d4ed8] inline-block" /> &gt;70rb</div>
+          <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-[#2563eb] inline-block" /> &gt;50rb</div>
+          <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-[#3b82f6] inline-block" /> &gt;35rb</div>
+          <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-[#60a5fa] inline-block" /> &gt;20rb</div>
+          <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-[#bfdbfe] inline-block" /> lainnya</div>
+        </div>
+      </div>
+
+      {selectedLabel && (
+        <div className="pointer-events-none absolute bottom-4 left-4 z-[1000] rounded-xl border border-border bg-card/90 px-3 py-2 shadow-lg backdrop-blur-sm">
+          <p className="text-[10px] font-semibold text-foreground">{selectedLabel}</p>
+          <button
+            onClick={onClearFocus}
+            className="pointer-events-auto mt-1 text-[10px] font-medium text-primary hover:underline"
+          >
+            Tampilkan semua wilayah
+          </button>
+        </div>
+      )}
+
+      <div ref={containerRef} className="w-full" style={{ height }} />
+    </div>
   );
 }
 
