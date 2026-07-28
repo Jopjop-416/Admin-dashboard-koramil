@@ -6,6 +6,7 @@ import {
   useMemo,
 } from "react";
 import logo from "../components/asset/image/logo.png";
+import foto3 from "../components/asset/image/foto3.jpg";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import {
@@ -1061,6 +1062,9 @@ function PopulationAnalytics({
   const totalHealth   = activeRows.reduce((s, k) => s + k.healthFacility, 0);
   const avgLiteracy   = (activeRows.reduce((s, k) => s + k.literacy, 0) / n).toFixed(1);
   const avgPdrb       = Math.round(activeRows.reduce((s, k) => s + k.pdrb, 0) / n);
+  const popPerSchool  = totalSchools > 0 ? Math.round(totalPop / totalSchools) : 0;
+  const popPerHealth  = totalHealth > 0 ? Math.round(totalPop / totalHealth) : 0;
+  const schoolHealthMix = totalSchools + totalHealth > 0 ? Math.round((totalSchools / (totalSchools + totalHealth)) * 100) : 0;
 
   const pctProduktif = 66;
   const pctPerempuan = totalPop > 0 ? Math.round((totalFemale / totalPop) * 100) : 51;
@@ -1123,13 +1127,19 @@ function PopulationAnalytics({
               {selectedDistrict ? `Ringkasan Kecamatan ${selectedDistrict.name}` : "Ringkasan seluruh kecamatan"}
             </p>
             <div className="space-y-4">
-              <div className="rounded-lg border border-blue-100 bg-blue-50 p-4">
+              <div
+                className="relative overflow-hidden rounded-lg border border-blue-100 p-4"
+                style={{
+                  backgroundImage: `linear-gradient(rgba(255,255,255,0.72), rgba(255,255,255,0.72)), url(${foto3})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
                 <div className="flex items-end justify-between gap-3">
                   <div>
-                    <p className="text-[10px] font-semibold text-blue-700">Luas Wilayah</p>
+                    <p className="text-[10px] font-semibold text-slate-700">Luas Wilayah</p>
                     <p className="mt-1 text-2xl font-medium leading-none text-slate-900">
-                      {totalArea.toFixed(selectedDistrict ? 1 : 0)}
-                      <span className="ml-1 text-xs font-normal text-slate-900">km2</span>
+                      {totalArea.toFixed(selectedDistrict ? 1 : 0)}km2
                     </p>
                   </div>
                   <div className="flex h-12 items-end gap-1">
@@ -1158,6 +1168,33 @@ function PopulationAnalytics({
                   </div>
                 </div>
               ))}
+
+              <div className="rounded-lg border border-border bg-secondary/40 p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-semibold text-foreground">Sorotan Cepat</p>
+                    <p className="text-[10px] text-muted-foreground">Rasio layanan pada wilayah aktif</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[11px] font-normal text-foreground">{selectedDistrict ? selectedDistrict.name : "Semua kecamatan"}</p>
+                    <p className="text-[10px] text-muted-foreground">{n} wilayah terpilih</p>
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  <div className="rounded-md bg-card px-2.5 py-2">
+                    <p className="text-[9px] text-muted-foreground">Penduduk / sekolah</p>
+                    <p className="mt-1 text-xs font-normal text-foreground">{fmt(popPerSchool)}</p>
+                  </div>
+                  <div className="rounded-md bg-card px-2.5 py-2">
+                    <p className="text-[9px] text-muted-foreground">Penduduk / faskes</p>
+                    <p className="mt-1 text-xs font-normal text-foreground">{fmt(popPerHealth)}</p>
+                  </div>
+                  <div className="rounded-md bg-card px-2.5 py-2">
+                    <p className="text-[9px] text-muted-foreground">Komposisi sekolah</p>
+                    <p className="mt-1 text-xs font-normal text-foreground">{schoolHealthMix}%</p>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="hidden">
               <div className="absolute inset-x-0 top-2 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
@@ -1331,14 +1368,14 @@ function PopulationAnalytics({
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-card border border-border rounded-xl p-4">
+        <div className="bg-card border border-border rounded-xl p-4 min-h-[312px]">
           <p className="text-xs font-semibold text-foreground">Kelahiran vs Kematian 2024</p>
           <p className="text-[10px] text-muted-foreground mb-2">Vital statistik bulanan kabupaten</p>
           <div className="flex gap-4 mb-3">
             <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground"><span className="w-3 h-2.5 rounded-sm bg-emerald-500 inline-block" /> Kelahiran</div>
             <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground"><span className="w-3 h-2.5 rounded-sm bg-rose-500 inline-block" /> Kematian</div>
           </div>
-          <ResponsiveContainer width="100%" height={195}>
+          <ResponsiveContainer width="100%" height={200}>
             <BarChart data={scaledVital}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
               <XAxis dataKey="month" tick={{ fontSize: 9, fill: "#888" }} axisLine={false} tickLine={false} />
@@ -1857,7 +1894,7 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }
           )}
         </div>
         {search && (
-          <span className={"text-[11px] px-2.5 py-1 rounded-md border " + (filteredKec.length === 0 ? "bg-red-50 border-red-200 text-red-600" : "bg-secondary border-border text-muted-foreground")}>
+          <span className={"text-[11px] px-2.5 py-1 rounded-md border " + (filteredKec.length === 0 ? "bg-red-50 border-red-200 text-red-600" : "border-border text-white bg-black")}>
             {filteredKec.length === 0 ? "Tidak ditemukan" : filteredKec.length === 1 ? ("Kec. " + filteredKec[0].name) : (filteredKec.length + " kecamatan")}
           </span>
         )}
@@ -2028,7 +2065,7 @@ function PopulationBubbleMap({
     const map = L.map(containerRef.current, {
       center: [-8.56, 116.53],
       zoom: 10.2,
-      zoomControl: true,
+      zoomControl: false,
       scrollWheelZoom: true,
     });
 
