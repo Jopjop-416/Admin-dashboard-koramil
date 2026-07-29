@@ -1,4 +1,4 @@
-﻿import {
+import {
   useState,
   useCallback,
   useEffect,
@@ -880,13 +880,13 @@ function buildDistrictTrend(districts: KecamatanRow[]): Record<string, number | 
   });
 }
 
-function DonutRing({ pct, label, sublabel, color }: { pct: number; label: string; sublabel: string; color: string }) {
+function DonutRing({ pct, label, sublabel, color, horizontal }: { pct: number; label: string; sublabel: string; color: string; horizontal?: boolean }) {
   const r = 34, cx = 46, cy = 46;
   const circ = 2 * Math.PI * r;
   const safePct = Math.max(0, Math.min(100, pct));
   const dash = (safePct / 100) * circ;
   return (
-    <div className="flex flex-col items-center gap-1.5 flex-1 min-w-0">
+    <div className={`flex ${horizontal ? 'flex-row text-left' : 'flex-col text-center'} items-center gap-3 flex-1 min-w-0`}>
       <div className="relative shrink-0">
         <svg width={92} height={92}>
           <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f0f0f0" strokeWidth={10} />
@@ -900,8 +900,10 @@ function DonutRing({ pct, label, sublabel, color }: { pct: number; label: string
           <span className="text-[15px] font-bold text-foreground leading-none">{safePct}%</span>
         </div>
       </div>
-      <p className="text-[11px] font-semibold text-center leading-tight text-foreground px-1">{label}</p>
-      <p className="text-[10px] text-muted-foreground text-center leading-tight px-1">{sublabel}</p>
+      <div>
+        <p className={`text-[11px] font-semibold leading-tight text-foreground ${horizontal ? '' : 'px-1'}`}>{label}</p>
+        <p className={`text-[10px] text-muted-foreground leading-tight mt-0.5 ${horizontal ? '' : 'px-1'}`}>{sublabel}</p>
+      </div>
     </div>
   );
 }
@@ -962,17 +964,21 @@ function ThreeDonutCard({
   title,
   sub,
   donuts,
+  isSidebar,
 }: {
   title: string;
   sub: string;
   donuts: { pct: number; label: string; sublabel: string; color: string }[];
+  isSidebar?: boolean;
 }) {
   return (
     <div className="bg-card border border-border rounded-xl p-5 flex flex-col">
       <p className="text-xs font-semibold text-foreground">{title}</p>
       <p className="text-[10px] text-muted-foreground mt-0.5 mb-5">{sub}</p>
-      <div className="flex items-start justify-around gap-2 flex-1">
-        {donuts.map((d, i) => <DonutRing key={i} {...d} />)}
+      <div className={isSidebar ? "flex flex-col gap-5 flex-1" : "flex items-start justify-around gap-2 flex-1"}>
+        {donuts.map((d, i) => (
+          <DonutRing key={i} {...d} horizontal={isSidebar} />
+        ))}
       </div>
     </div>
   );
@@ -1204,6 +1210,7 @@ function PopulationAnalytics({
           <ThreeDonutCard
             title="Komposisi Kependudukan"
             sub="Tiga indikator demografis utama"
+            isSidebar={hideMapAndFocus}
             donuts={[
               { pct: pctProduktif, label: "Usia Produktif", sublabel: "15–64 tahun dari total", color: "#3b82f6" },
               { pct: pctPerempuan, label: "Perempuan", sublabel: "% dari total penduduk", color: "#ec4899" },
