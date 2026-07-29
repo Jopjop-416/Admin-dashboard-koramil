@@ -7,6 +7,7 @@ import {
 } from "react";
 import logo from "../components/asset/image/logo.png";
 import foto3 from "../components/asset/image/foto3.jpg";
+import bg1 from "../components/asset/image/bg1.jpg";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import Populasi from "./menu/populasi";
@@ -367,6 +368,7 @@ function StatCard({
   sub,
   color,
   trend,
+  bgImage,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -374,31 +376,43 @@ function StatCard({
   sub: string;
   color: string;
   trend?: number;
+  bgImage?: string;
 }) {
   return (
-    <div className="bg-card border border-border rounded-xl p-4 hover:border-primary/30 transition-all duration-200 group">
-      <div className="flex items-start justify-between mb-3">
-        <div
-          className={`w-9 h-9 rounded-lg flex items-center justify-center ${color}`}
-        >
-          {icon}
+    <div className={`relative overflow-hidden bg-card border border-border rounded-xl p-4 hover:border-primary/30 transition-all duration-200 group ${bgImage ? 'text-white' : ''}`}>
+      {bgImage && (
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center" 
+          style={{ backgroundImage: `url(${bgImage})` }} 
+        />
+      )}
+      {bgImage && (
+        <div className="absolute inset-0 z-0 bg-black/60" />
+      )}
+      <div className="relative z-10">
+        <div className="flex items-start justify-between mb-3">
+          <div
+            className={`w-9 h-9 rounded-lg flex items-center justify-center ${color}`}
+          >
+            {icon}
+          </div>
+          {trend !== undefined && (
+            <span className={`flex items-center gap-0.5 text-[11px] font-sans ${bgImage ? 'text-white/80' : 'text-muted-foreground'}`}>
+              <ArrowUpRight size={12} />
+              {trend}%
+            </span>
+          )}
         </div>
-        {trend !== undefined && (
-          <span className="flex items-center gap-0.5 text-[11px] font-sans text-muted-foreground">
-            <ArrowUpRight size={12} />
-            {trend}%
-          </span>
-        )}
+        <p className={`text-xl font-semibold tracking-tight font-sans ${bgImage ? 'text-white' : 'text-foreground'}`}>
+          {value}
+        </p>
+        <p className={`text-[11px] font-medium mt-0.5 ${bgImage ? 'text-white/90' : 'text-foreground'}`}>
+          {label}
+        </p>
+        <p className={`text-[10px] mt-0.5 ${bgImage ? 'text-white/70' : 'text-muted-foreground'}`}>
+          {sub}
+        </p>
       </div>
-      <p className="text-xl font-semibold text-foreground tracking-tight font-sans">
-        {value}
-      </p>
-      <p className="text-[11px] font-medium text-foreground mt-0.5">
-        {label}
-      </p>
-      <p className="text-[10px] text-muted-foreground mt-0.5">
-        {sub}
-      </p>
     </div>
   );
 }
@@ -1867,11 +1881,11 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }
   const sexRatio    = totalFemale > 0 ? (totalMale / totalFemale * 100).toFixed(1) : "0";
   const scaleFactor = statRows.length === 1 ? statRows[0].population / 1293040 : 1;
 
-  type CardDef = { icon: React.ReactNode; label: string; value: string; sub: string; color: string; iconColor: string; trend?: number };
+  type CardDef = { icon: React.ReactNode; label: string; value: string; sub: string; color: string; iconColor: string; trend?: number; bgImage?: string };
 
   const cards: Record<Category, CardDef[]> = {
     penduduk: [
-      { icon: <Users size={17} />,      label: "Total Penduduk",         value: fmtK(totalPop),                            sub: "Jiwa terdaftar 2024",                                       color: "bg-blue-50",   iconColor: "text-blue-600",   trend: parseFloat(avgGrowth) },
+      { icon: <Users size={17} />,      label: "Total Penduduk",         value: fmtK(totalPop),                            sub: "Jiwa terdaftar 2024",                                       color: "bg-blue-50",   iconColor: "text-blue-600",   trend: parseFloat(avgGrowth), bgImage: bg1 },
       { icon: <Users size={17} />,      label: "Laki-laki",              value: fmtK(totalMale),                           sub: (totalPop ? ((totalMale / totalPop) * 100).toFixed(1) : "0") + "% dari total",  color: "bg-sky-50",    iconColor: "text-sky-600"   },
       { icon: <Heart size={17} />,      label: "Perempuan",              value: fmtK(totalFemale),                         sub: (totalPop ? ((totalFemale / totalPop) * 100).toFixed(1) : "0") + "% dari total", color: "bg-rose-50",   iconColor: "text-rose-500"  },
       { icon: <Activity size={17} />,   label: "Rasio Jenis Kelamin",    value: sexRatio,                                  sub: "Laki per 100 perempuan",                                    color: "bg-purple-50", iconColor: "text-purple-600" },
@@ -1954,12 +1968,12 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }
       {/* 8 Stat Cards in 2 rows */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {activeCards.slice(0, 4).map((c, i) => (
-          <StatCard key={i} icon={<span className={c.iconColor}>{c.icon}</span>} label={c.label} value={c.value} sub={c.sub} color={c.color} trend={c.trend} />
+          <StatCard key={i} icon={<span className={c.iconColor}>{c.icon}</span>} label={c.label} value={c.value} sub={c.sub} color={c.color} trend={c.trend} bgImage={c.bgImage} />
         ))}
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {activeCards.slice(4).map((c, i) => (
-          <StatCard key={i + 4} icon={<span className={c.iconColor}>{c.icon}</span>} label={c.label} value={c.value} sub={c.sub} color={c.color} trend={c.trend} />
+          <StatCard key={i + 4} icon={<span className={c.iconColor}>{c.icon}</span>} label={c.label} value={c.value} sub={c.sub} color={c.color} trend={c.trend} bgImage={c.bgImage} />
         ))}
       </div>
 
