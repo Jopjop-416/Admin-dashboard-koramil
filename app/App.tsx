@@ -9,6 +9,10 @@ import logo from "../components/asset/image/logo.png";
 import foto3 from "../components/asset/image/foto3.jpg";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import Populasi from "./menu/populasi";
+import Geographic from "./menu/geographic";
+import Ekonomi from "./menu/ekonomi";
+import Sosial from "./menu/sosial";
 import {
   AreaChart,
   Area,
@@ -167,7 +171,7 @@ function normalizeSearch(value: string): string {
 
 // ─── SIDEBAR ──────────────────────────────────────────────────────────────────
 
-type Page = "dashboard" | "maps" | "laporan";
+type Page = "dashboard" | "maps" | "laporan" | "populasi" | "geographic" | "ekonomi" | "sosial";
 
 const navItems: {
   id: Page;
@@ -188,6 +192,26 @@ const navItems: {
     id: "laporan",
     label: "Data Laporan",
     icon: <FileText size={18} />,
+  },
+  {
+    id: "populasi",
+    label: "Data Populasi",
+    icon: <Users size={18} />,
+  },
+  {
+    id: "geographic",
+    label: "Data Geographic",
+    icon: <MapPin size={18} />,
+  },
+  {
+    id: "ekonomi",
+    label: "Data Ekonomi",
+    icon: <TrendingUp size={18} />,
+  },
+  {
+    id: "sosial",
+    label: "Data Sosial",
+    icon: <Heart size={18} />,
   },
 ];
 
@@ -1143,9 +1167,9 @@ function PopulationAnalytics({
                     </p>
                   </div>
                   <div className="flex h-12 items-end gap-1">
-                    <span className="w-2.5 rounded-t bg-blue-300" style={{ height: `${Math.max(18, Math.min(100, totalVillages / (selectedDistrict ? 18 : 260) * 100))}%` }} />
-                    <span className="w-2.5 rounded-t bg-blue-500" style={{ height: `${Math.max(18, Math.min(100, totalHamlets / (selectedDistrict ? 60 : 900) * 100))}%` }} />
-                    <span className="w-2.5 rounded-t bg-blue-700" style={{ height: `${Math.max(18, Math.min(100, totalRoad / (selectedDistrict ? 100 : 1200) * 100))}%` }} />
+                    <span className="w-2.5 rounded-t bg-blue-300 border border-white" style={{ height: `${Math.max(18, Math.min(100, totalVillages / (selectedDistrict ? 18 : 260) * 100))}%` }} />
+                    <span className="w-2.5 rounded-t bg-blue-500 border border-white" style={{ height: `${Math.max(18, Math.min(100, totalHamlets / (selectedDistrict ? 60 : 900) * 100))}%` }} />
+                    <span className="w-2.5 rounded-t bg-blue-700 border border-white" style={{ height: `${Math.max(18, Math.min(100, totalRoad / (selectedDistrict ? 100 : 1200) * 100))}%` }} />
                   </div>
                 </div>
               </div>
@@ -1873,7 +1897,7 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }
             <button
               key={cat}
               onClick={() => setCategory(cat)}
-              className={"text-xs px-3.5 py-1.5 rounded-lg font-medium transition-all " + (category === cat ? "bg-card text-foreground shadow-sm border border-border" : "text-muted-foreground hover:text-foreground")}
+              className={"text-xs px-3.5 py-1.5 rounded-lg font-medium transition-all " + (category === cat ? "bg-black text-white shadow-sm" : "text-muted-foreground hover:text-foreground")}
             >
               {CATEGORY_LABELS[cat]}
             </button>
