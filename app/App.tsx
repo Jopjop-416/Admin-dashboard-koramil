@@ -56,7 +56,7 @@ import {
 
 // ─── DATA ──────────────────────────────────────────────────────────────────────
 
-type KecamatanRow = {
+export type KecamatanRow = {
   id: number;
   name: string;
   lat: number;
@@ -176,11 +176,11 @@ const monthlyData = [
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
-function fmt(n: number) {
+export function fmt(n: number) {
   return n.toLocaleString("id-ID");
 }
 
-function fmtK(n: number) {
+export function fmtK(n: number) {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + " jt";
   if (n >= 1_000) return (n / 1_000).toFixed(1) + " rb";
   return String(n);
@@ -2013,7 +2013,7 @@ function LeafletMap({
     const map = L.map(containerRef.current, {
       center: [-8.58, 116.53],
       zoom: 10,
-      zoomControl: true,
+      zoomControl: false,
     });
     L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
@@ -2745,15 +2745,15 @@ function DataLaporanPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="bg-secondary/40 border-b-2 border-border/70">
-                <th className="text-left px-4 py-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider w-8 border-b-2 border-border/70 bg-secondary/40">
+              <tr className="bg-white border-b-2 border-border/70">
+                <th className="text-left px-4 py-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider w-8 border-b-2 border-border/70 bg-white">
                   No
                 </th>
                 {cols.map((c) => (
                   <th
                     key={c.key}
                     onClick={() => toggleSort(c.key)}
-                    className="text-left px-3 py-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider cursor-pointer hover:text-foreground transition-colors whitespace-nowrap select-none border-b-2 border-border/70 bg-secondary/40"
+                    className="text-left px-3 py-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider cursor-pointer hover:text-foreground transition-colors whitespace-nowrap select-none border-b-2 border-border/70 bg-white"
                   >
                     <span className="flex items-center gap-1">
                       {c.label}
@@ -2886,6 +2886,22 @@ const PAGE_META: Record<
     title: "Data Laporan Kependudukan",
     subtitle: "Rekapitulasi Data Statistik Seluruh Kecamatan",
   },
+  populasi: {
+    title: "Data Populasi",
+    subtitle: "Detail Penduduk & Demografi",
+  },
+  geographic: {
+    title: "Data Geografis",
+    subtitle: "Detail Wilayah & Geografi",
+  },
+  ekonomi: {
+    title: "Data Ekonomi",
+    subtitle: "Detail Perekonomian & Ketenagakerjaan",
+  },
+  sosial: {
+    title: "Data Sosial",
+    subtitle: "Detail Pendidikan & Kesehatan",
+  },
 };
 
 export default function App() {
@@ -2913,6 +2929,10 @@ export default function App() {
           )}
           {page === "maps" && <MapsPage />}
           {page === "laporan" && <DataLaporanPage />}
+          {page === "populasi" && <Populasi />}
+          {page === "geographic" && <Geographic />}
+          {page === "ekonomi" && <Ekonomi />}
+          {page === "sosial" && <Sosial />}
         </main>
       </div>
 
