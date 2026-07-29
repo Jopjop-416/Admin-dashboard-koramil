@@ -1,4 +1,4 @@
-import {
+﻿import {
   useState,
   useCallback,
   useEffect,
@@ -47,11 +47,13 @@ import {
   ArrowUpRight,
   Bell,
   ChevronRight,
+  ChevronDown,
   Layers,
   MapPin,
   Table2,
   BarChart3,
   Activity,
+  AlertCircle,
 } from "lucide-react";
 
 // ─── DATA ──────────────────────────────────────────────────────────────────────
@@ -1095,12 +1097,14 @@ function PopulationAnalytics({
   onDistrict,
   selectedDistrict,
   onClearFocus,
+  hideMapAndFocus,
 }: {
   D: KecamatanRow[];
   scaleFactor: number;
   onDistrict: (k: KecamatanRow) => void;
   selectedDistrict: KecamatanRow | null;
   onClearFocus: () => void;
+  hideMapAndFocus?: boolean;
 }) {
   const activeRows = selectedDistrict ? [selectedDistrict] : D;
   const n = activeRows.length || 1;
@@ -1141,9 +1145,42 @@ function PopulationAnalytics({
     { key: "growth",     label: "Laju (%)",     render: (k) => <span className={k.growth >= 2 ? "text-green-600 font-semibold" : "text-muted-foreground"}>{k.growth.toFixed(1)}%</span> },
   ];
 
+  const indikatorLayananBlock = (
+    <div className="bg-card border border-border rounded-xl p-5">
+      <p className="text-xs font-semibold text-foreground">Indikator Layanan</p>
+      <p className="text-[10px] text-muted-foreground mt-0.5 mb-4">
+        Pendidikan, kesehatan, dan ekonomi wilayah
+      </p>
+      <div className="space-y-3">
+        {[
+          { label: "Sekolah", value: fmt(totalSchools), note: "fasilitas", pct: Math.min(100, totalSchools / (selectedDistrict ? 50 : 760) * 100), color: "#10b981" },
+          { label: "Faskes", value: fmt(totalHealth), note: "layanan", pct: Math.min(100, totalHealth / (selectedDistrict ? 10 : 130) * 100), color: "#f43f5e" },
+          { label: "Melek Huruf", value: `${avgLiteracy}%`, note: "literasi", pct: Number(avgLiteracy), color: "#14b8a6" },
+          { label: "PDRB/Kapita", value: `Rp ${(avgPdrb / 1000).toFixed(2)} jt`, note: "ekonomi", pct: Math.min(100, (avgPdrb / 20000) * 100), color: "#f59e0b" },
+        ].map((item) => (
+          <div key={item.label}>
+            <div className="mb-1 flex items-end justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold text-foreground leading-tight">{item.label}</p>
+                <p className="text-[10px] text-muted-foreground leading-tight">{item.note}</p>
+              </div>
+              <p className="text-[11px] font-normal text-foreground whitespace-nowrap">{item.value}</p>
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
+              <div
+                className="h-full rounded-full"
+                style={{ width: `${Math.max(8, item.pct)}%`, backgroundColor: item.color }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-5">
-      {selectedDistrict && (
+      {selectedDistrict && !hideMapAndFocus && (
         <div className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3">
           <div>
             <p className="text-xs font-semibold text-foreground">
@@ -1180,28 +1217,30 @@ function PopulationAnalytics({
               {selectedDistrict ? `Ringkasan Kecamatan ${selectedDistrict.name}` : "Ringkasan seluruh kecamatan"}
             </p>
             <div className="space-y-4">
-              <div
-                className="relative overflow-hidden rounded-lg border border-blue-100 p-4"
-                style={{
-                  backgroundImage: `linear-gradient(rgba(255,255,255,0.72), rgba(255,255,255,0.72)), url(${foto3})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }}
-              >
-                <div className="flex items-end justify-between gap-3">
-                  <div>
-                    <p className="text-[10px] font-semibold text-slate-700">Luas Wilayah</p>
-                    <p className="mt-1 text-2xl font-medium leading-none text-slate-900">
-                      {totalArea.toFixed(selectedDistrict ? 1 : 0)}<span className="text-sm text-slate-700 ml-0.5">km²</span>
-                    </p>
-                  </div>
-                  <div className="flex h-12 items-end gap-1">
-                    <span className="w-3.5 rounded-t bg-blue-300 border-1 border-white" style={{ height: `${Math.max(18, Math.min(100, totalVillages / (selectedDistrict ? 18 : 260) * 100))}%` }} />
-                    <span className="w-3.5 rounded-t bg-blue-500 border-1 border-white" style={{ height: `${Math.max(18, Math.min(100, totalHamlets / (selectedDistrict ? 60 : 900) * 100))}%` }} />
-                    <span className="w-3.5 rounded-t bg-blue-700 border-1 border-white" style={{ height: `${Math.max(18, Math.min(100, totalRoad / (selectedDistrict ? 100 : 1200) * 100))}%` }} />
+              {!hideMapAndFocus && (
+                <div
+                  className="relative overflow-hidden rounded-lg border border-blue-100 p-4"
+                  style={{
+                    backgroundImage: `linear-gradient(rgba(255,255,255,0.72), rgba(255,255,255,0.72)), url(${foto3})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                >
+                  <div className="flex items-end justify-between gap-3">
+                    <div>
+                      <p className="text-[10px] font-semibold text-slate-700">Luas Wilayah</p>
+                      <p className="mt-1 text-2xl font-medium leading-none text-slate-900">
+                        {totalArea.toFixed(selectedDistrict ? 1 : 0)}<span className="text-sm text-slate-700 ml-0.5">km²</span>
+                      </p>
+                    </div>
+                    <div className="flex h-12 items-end gap-1">
+                      <span className="w-3.5 rounded-t bg-blue-300 border-1 border-white" style={{ height: `${Math.max(18, Math.min(100, totalVillages / (selectedDistrict ? 18 : 260) * 100))}%` }} />
+                      <span className="w-3.5 rounded-t bg-blue-500 border-1 border-white" style={{ height: `${Math.max(18, Math.min(100, totalHamlets / (selectedDistrict ? 60 : 900) * 100))}%` }} />
+                      <span className="w-3.5 rounded-t bg-blue-700 border-1 border-white" style={{ height: `${Math.max(18, Math.min(100, totalRoad / (selectedDistrict ? 100 : 1200) * 100))}%` }} />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {[
                 { label: "Desa/Kel.", value: fmt(totalVillages), note: "unit administrasi", pct: Math.min(100, totalVillages / (selectedDistrict ? 18 : 260) * 100), color: "#f59e0b" },
@@ -1233,20 +1272,37 @@ function PopulationAnalytics({
                     <p className="text-[10px] text-muted-foreground">{n} wilayah terpilih</p>
                   </div>
                 </div>
-                <div className="mt-3 grid grid-cols-3 gap-2">
-                  <div className="rounded-md bg-card px-2.5 py-2">
-                    <p className="text-[9px] text-muted-foreground">Penduduk / sekolah</p>
-                    <p className="mt-1 text-xs font-normal text-foreground">{fmt(popPerSchool)}</p>
+                {hideMapAndFocus ? (
+                  <div className="mt-3 flex flex-col gap-1.5">
+                    <div className="flex justify-between items-center rounded-md bg-card px-2.5 py-2">
+                      <p className="text-[10px] text-muted-foreground">Penduduk / sekolah</p>
+                      <p className="text-xs font-medium text-foreground">{fmt(popPerSchool)}</p>
+                    </div>
+                    <div className="flex justify-between items-center rounded-md bg-card px-2.5 py-2">
+                      <p className="text-[10px] text-muted-foreground">Penduduk / faskes</p>
+                      <p className="text-xs font-medium text-foreground">{fmt(popPerHealth)}</p>
+                    </div>
+                    <div className="flex justify-between items-center rounded-md bg-card px-2.5 py-2">
+                      <p className="text-[10px] text-muted-foreground">Komposisi sekolah</p>
+                      <p className="text-xs font-medium text-foreground">{schoolHealthMix}%</p>
+                    </div>
                   </div>
-                  <div className="rounded-md bg-card px-2.5 py-2">
-                    <p className="text-[9px] text-muted-foreground">Penduduk / faskes</p>
-                    <p className="mt-1 text-xs font-normal text-foreground">{fmt(popPerHealth)}</p>
+                ) : (
+                  <div className="mt-3 grid grid-cols-3 gap-2">
+                    <div className="rounded-md bg-card px-2.5 py-2">
+                      <p className="text-[9px] text-muted-foreground">Penduduk / sekolah</p>
+                      <p className="mt-1 text-xs font-normal text-foreground">{fmt(popPerSchool)}</p>
+                    </div>
+                    <div className="rounded-md bg-card px-2.5 py-2">
+                      <p className="text-[9px] text-muted-foreground">Penduduk / faskes</p>
+                      <p className="mt-1 text-xs font-normal text-foreground">{fmt(popPerHealth)}</p>
+                    </div>
+                    <div className="rounded-md bg-card px-2.5 py-2">
+                      <p className="text-[9px] text-muted-foreground">Komposisi sekolah</p>
+                      <p className="mt-1 text-xs font-normal text-foreground">{schoolHealthMix}%</p>
+                    </div>
                   </div>
-                  <div className="rounded-md bg-card px-2.5 py-2">
-                    <p className="text-[9px] text-muted-foreground">Komposisi sekolah</p>
-                    <p className="mt-1 text-xs font-normal text-foreground">{schoolHealthMix}%</p>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
             <div className="hidden">
@@ -1315,87 +1371,21 @@ function PopulationAnalytics({
               />
             </div>
           </div>
-
-          <div className="bg-card border border-border rounded-xl p-5">
-            <p className="text-xs font-semibold text-foreground">Indikator Layanan</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5 mb-4">
-              Pendidikan, kesehatan, dan ekonomi wilayah
-            </p>
-              <div className="space-y-3">
-              {[
-                { label: "Sekolah", value: fmt(totalSchools), note: "fasilitas", pct: Math.min(100, totalSchools / (selectedDistrict ? 50 : 760) * 100), color: "#10b981" },
-                { label: "Faskes", value: fmt(totalHealth), note: "layanan", pct: Math.min(100, totalHealth / (selectedDistrict ? 10 : 130) * 100), color: "#f43f5e" },
-                { label: "Melek Huruf", value: `${avgLiteracy}%`, note: "literasi", pct: Number(avgLiteracy), color: "#14b8a6" },
-                { label: "PDRB/Kapita", value: `Rp ${(avgPdrb / 1000).toFixed(2)} jt`, note: "ekonomi", pct: Math.min(100, (avgPdrb / 20000) * 100), color: "#f59e0b" },
-              ].map((item) => (
-                <div key={item.label}>
-                  <div className="mb-1 flex items-end justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-semibold text-foreground leading-tight">{item.label}</p>
-                      <p className="text-[10px] text-muted-foreground leading-tight">{item.note}</p>
-                    </div>
-                    <p className="text-[11px] font-normal text-foreground whitespace-nowrap">{item.value}</p>
-                  </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
-                    <div
-                      className="h-full rounded-full"
-                      style={{ width: `${Math.max(8, item.pct)}%`, backgroundColor: item.color }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="hidden">
-              <MetricRing
-                value={totalSchools}
-                max={50}
-                display={fmt(totalSchools)}
-                unit="sekolah"
-                label="Sekolah"
-                sublabel="Fasilitas pendidikan"
-                color="#10b981"
-              />
-              <MetricRing
-                value={totalHealth}
-                max={10}
-                display={fmt(totalHealth)}
-                unit="faskes"
-                label="Faskes"
-                sublabel="Layanan kesehatan"
-                color="#f43f5e"
-              />
-              <MetricRing
-                value={Number(avgLiteracy)}
-                max={100}
-                display={avgLiteracy}
-                unit="%"
-                label="Melek Huruf"
-                sublabel="Persentase literasi"
-                color="#4876ecff"
-              />
-              <MetricRing
-                value={avgPdrb / 1000}
-                max={20}
-                display={(avgPdrb / 1000).toFixed(2)}
-                unit="jt"
-                label="PDRB/Kapita"
-                sublabel="Rata-rata per kapita"
-                color="#f59e0b"
-              />
-            </div>
-          </div>
+          {!hideMapAndFocus && indikatorLayananBlock}
         </div>
         <div className="xl:col-span-2 space-y-5">
-        <PopulationBubbleMap
-          selectedId={selectedDistrict?.id ?? null}
-          onSelect={(k) => {
-            onDistrict(k);
-          }}
-          onClearFocus={() => {
-            onClearFocus();
-          }}
-          height={360}
-        />
+        {!hideMapAndFocus && (
+          <PopulationBubbleMap
+            selectedId={selectedDistrict?.id ?? null}
+            onSelect={(k) => {
+              onDistrict(k);
+            }}
+            onClearFocus={() => {
+              onClearFocus();
+            }}
+            height={360}
+          />
+        )}
 
         <div className="bg-card border border-border rounded-xl p-4">
           <p className="text-xs font-semibold text-foreground">Perbandingan 5 Kecamatan Terpadat 2020–2024</p>
@@ -1439,6 +1429,7 @@ function PopulationAnalytics({
             </BarChart>
           </ResponsiveContainer>
         </div>
+        {hideMapAndFocus && indikatorLayananBlock}
       </div>
       </div>
 
@@ -2297,6 +2288,7 @@ function MapsPage() {
   const [filter, setFilter] = useState<
     "all" | "padat" | "jarang"
   >("all");
+  const [category, setCategory] = useState<Category>("penduduk");
 
   const handleSelect = useCallback(
     (k: KecamatanRow) => setSelected(k),
@@ -2367,155 +2359,135 @@ function MapsPage() {
       </div>
 
       {/* Detail Panel */}
-      <div className="w-72 shrink-0 bg-card border-l border-border overflow-y-auto flex flex-col">
-        <div className="p-4 border-b border-border">
+      <div className={`shrink-0 bg-card border-l border-border flex flex-col transition-all duration-300 ${selected ? 'w-[50vw]' : 'w-72'}`}>
+        <div className="p-4 border-b border-border bg-card z-10 shrink-0">
           <p className="text-xs font-semibold text-foreground">
-            Detail Kecamatan
+            {selected ? "Detail Wilayah & Analisis" : "Detail Kecamatan"}
           </p>
           <p className="text-[10px] text-muted-foreground">
-            Klik penanda di peta untuk detail
+            {selected ? "Statistik komprehensif kecamatan" : "Klik penanda di peta untuk detail"}
           </p>
         </div>
 
-        {selected ? (
-          <div className="p-4 space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center">
-                <MapPin size={16} className="text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">
-                  Kec. {selected.name}
-                </p>
-                <p className="text-[10px] text-muted-foreground">
-                  Lombok Timur, NTB
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                {
-                  label: "Penduduk",
-                  value: fmt(selected.population),
-                  unit: "jiwa",
-                },
-                {
-                  label: "Laki-laki",
-                  value: fmt(selected.male),
-                  unit: "jiwa",
-                },
-                {
-                  label: "Perempuan",
-                  value: fmt(selected.female),
-                  unit: "jiwa",
-                },
-                {
-                  label: "Luas",
-                  value: selected.area.toFixed(2),
-                  unit: "km²",
-                },
-                {
-                  label: "Kepadatan",
-                  value: fmt(selected.density),
-                  unit: "/km²",
-                },
-                {
-                  label: "Desa/Kel.",
-                  value: String(selected.villages),
-                  unit: "wil.",
-                },
-                {
-                  label: "Melek Huruf",
-                  value: selected.literacy.toFixed(1),
-                  unit: "%",
-                },
-                {
-                  label: "Pengangguran",
-                  value: selected.unemployment.toFixed(1),
-                  unit: "%",
-                },
-              ].map((d) => (
-                <div
-                  key={d.label}
-                  className="bg-secondary/50 border border-border rounded-lg p-2.5"
-                >
-                  <p className="text-[9px] text-muted-foreground mb-0.5">
-                    {d.label}
+        <div className="flex-1 overflow-y-auto">
+          {selected ? (
+            <div className="p-4 space-y-5">
+              {/* Header Info */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+                  <MapPin size={18} className="text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground truncate">
+                    Kecamatan {selected.name}
                   </p>
-                  <p className="text-xs font-semibold font-sans text-foreground">
-                    {d.value}{" "}
-                    <span className="text-[9px] font-normal text-muted-foreground">
-                      {d.unit}
-                    </span>
+                  <p className="text-[10px] text-muted-foreground truncate">
+                    Lombok Timur, Nusa Tenggara Barat
                   </p>
                 </div>
-              ))}
-            </div>
+                <button
+                  onClick={() => setSelected(null)}
+                  className="px-3 py-1.5 text-[10px] font-medium rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors shrink-0"
+                >
+                  Tutup
+                </button>
+              </div>
 
-            <div className="p-2.5 bg-accent/5 border border-accent/20 rounded-lg flex items-center gap-2">
-              <TrendingUp
-                size={12}
-                className="text-muted-foreground"
-              />
-              <span className="text-[10px] text-muted-foreground">
-                Laju pertumbuhan
-              </span>
-              <span className="ml-auto text-[11px] font-sans font-semibold text-foreground">
-                +{selected.growth}%
-              </span>
-            </div>
+              {/* Controls */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                {/* Category selector */}
+                <div className="flex w-fit shrink-0 gap-1 bg-secondary rounded-md p-1 border border-border">
+                  {(Object.keys(CATEGORY_LABELS) as Category[]).map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setCategory(cat)}
+                      className={"text-[11px] px-3 py-1.5 rounded-lg font-medium transition-all whitespace-nowrap " + (category === cat ? "bg-black text-white shadow-sm" : "text-muted-foreground hover:text-foreground")}
+                    >
+                      {CATEGORY_LABELS[cat]}
+                    </button>
+                  ))}
+                </div>
+                
+                {/* Year Dropdown */}
+                <div className="relative shrink-0 flex items-center">
+                  <select 
+                    defaultValue=""
+                    className="px-3 py-1.5 pr-8 h-[34px] text-[11px] font-medium bg-card border border-border rounded-lg outline-none cursor-pointer hover:bg-secondary appearance-none transition-colors text-muted-foreground focus:text-foreground"
+                  >
+                    <option value="" disabled hidden>Tahun</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                  </select>
+                  <ChevronDown size={13} className="absolute right-2.5 text-muted-foreground pointer-events-none" />
+                </div>
 
-            <button
-              onClick={() => setSelected(null)}
-              className="w-full text-[11px] py-2 rounded-lg border border-border text-muted-foreground hover:border-primary/50 hover:text-foreground transition-colors"
-            >
-              Tutup Detail
-            </button>
-          </div>
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-            <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-3">
-              <Map
-                size={20}
-                className="text-muted-foreground"
-              />
-            </div>
-            <p className="text-xs font-medium text-foreground">
-              Belum ada kecamatan dipilih
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-1">
-              Klik salah satu lingkaran di peta untuk melihat
-              detail informasi
-            </p>
-          </div>
-        )}
+                {/* Permasalahan Button */}
+                <button className="px-3 py-1.5 h-[34px] flex items-center gap-1.5 text-[11px] font-medium bg-black text-white border border-black rounded-lg hover:bg-gray-900 hover:text-gray-100 transition-colors shrink-0">
+                  <AlertCircle size={13} />
+                  Permasalahan
+                </button>
+              </div>
 
-        {/* Districts list */}
-        <div className="border-t border-border p-4">
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            Daftar Kecamatan
-          </p>
-          <div className="space-y-1">
-            {kecamatan.map((k) => (
-              <button
-                key={k.id}
-                onClick={() => setSelected(k)}
-                className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
-                  selected?.id === k.id
-                    ? "bg-primary/15 border border-primary/30"
-                    : "hover:bg-secondary border border-transparent"
-                }`}
-              >
-                <span className="text-[11px] text-foreground">
-                  {k.name}
-                </span>
-                <span className="text-[10px] font-sans text-muted-foreground">
-                  {fmtK(k.population)}
-                </span>
-              </button>
-            ))}
-          </div>
+              {/* Analytics Content */}
+              <div className="mt-4">
+                {category === "penduduk" && (
+                  <PopulationAnalytics
+                    D={[selected]}
+                    scaleFactor={1}
+                    onDistrict={() => {}}
+                    selectedDistrict={selected}
+                    onClearFocus={() => setSelected(null)}
+                    hideMapAndFocus={true}
+                  />
+                )}
+                {category === "geografis" && <GeografisAnalytics D={[selected]} />}
+                {category === "ekonomi"   && <EkonomiAnalytics D={[selected]} />}
+                {category === "sosial"    && <SosialAnalytics D={[selected]} />}
+              </div>
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center p-6 text-center h-full min-h-[400px]">
+              <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-3">
+                <Map
+                  size={20}
+                  className="text-muted-foreground"
+                />
+              </div>
+              <p className="text-xs font-medium text-foreground">
+                Belum ada kecamatan dipilih
+              </p>
+              <p className="text-[10px] text-muted-foreground mt-1 max-w-[200px]">
+                Klik salah satu lingkaran di peta untuk melihat detail informasi dan analitik wilayah.
+              </p>
+            </div>
+          )}
+
+          {/* Districts list (only show when no district is selected) */}
+          {!selected && (
+            <div className="border-t border-border p-4">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                Daftar Kecamatan
+              </p>
+              <div className="space-y-1">
+                {kecamatan.map((k) => (
+                  <button
+                    key={k.id}
+                    onClick={() => setSelected(k)}
+                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors hover:bg-secondary border border-transparent`}
+                  >
+                    <span className="text-[11px] text-foreground">
+                      {k.name}
+                    </span>
+                    <span className="text-[10px] font-sans text-muted-foreground">
+                      {fmtK(k.population)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
