@@ -88,27 +88,27 @@ type KecamatanRow = {
 };
 
 const kecamatan: KecamatanRow[] = [
-  { id: 1,  name: "Keruak",         lat: -8.780, lng: 116.513, population: 52340,  area: 72.26,  villages: 15, male: 25800, female: 26540, density: 724,  literacy: 82.4, unemployment: 5.2, growth: 1.8, gridCol: 2, gridRow: 7, households: 14200, schoolCount: 38, healthFacility: 6,  posyandu: 28, worshipPlace: 52,  roadLength: 48,  elevation: 5,   avgSchooling: 6.8, industry: 85,  markets: 3, cooperatives: 4,  pdrb: 14200, hamlets: 42, distanceToCapital: 38, sawahPct: 35, aps: 78.2 },
-  { id: 2,  name: "Jerowaru",       lat: -8.795, lng: 116.440, population: 44820,  area: 147.32, villages: 11, male: 21900, female: 22920, density: 304,  literacy: 79.8, unemployment: 6.1, growth: 1.4, gridCol: 1, gridRow: 7, households: 12100, schoolCount: 29, healthFacility: 5,  posyandu: 22, worshipPlace: 44,  roadLength: 62,  elevation: 8,   avgSchooling: 6.2, industry: 68,  markets: 2, cooperatives: 3,  pdrb: 12800, hamlets: 35, distanceToCapital: 42, sawahPct: 18, aps: 74.5 },
-  { id: 3,  name: "Sakra",          lat: -8.720, lng: 116.452, population: 61500,  area: 30.25,  villages: 14, male: 30100, female: 31400, density: 2033, literacy: 88.1, unemployment: 4.3, growth: 2.1, gridCol: 2, gridRow: 6, households: 16600, schoolCount: 42, healthFacility: 7,  posyandu: 32, worshipPlace: 58,  roadLength: 35,  elevation: 12,  avgSchooling: 7.4, industry: 110, markets: 4, cooperatives: 5,  pdrb: 16500, hamlets: 48, distanceToCapital: 18, sawahPct: 52, aps: 83.4 },
-  { id: 4,  name: "Sakra Barat",    lat: -8.730, lng: 116.400, population: 43800,  area: 49.35,  villages: 12, male: 21400, female: 22400, density: 888,  literacy: 84.6, unemployment: 4.9, growth: 1.6, gridCol: 1, gridRow: 6, households: 11800, schoolCount: 31, healthFacility: 5,  posyandu: 25, worshipPlace: 46,  roadLength: 40,  elevation: 15,  avgSchooling: 7.1, industry: 90,  markets: 3, cooperatives: 3,  pdrb: 15100, hamlets: 36, distanceToCapital: 22, sawahPct: 45, aps: 80.1 },
-  { id: 5,  name: "Sakra Timur",    lat: -8.710, lng: 116.490, population: 37600,  area: 40.15,  villages: 10, male: 18400, female: 19200, density: 936,  literacy: 83.2, unemployment: 5.5, growth: 1.5, gridCol: 3, gridRow: 6, households: 10100, schoolCount: 26, healthFacility: 4,  posyandu: 20, worshipPlace: 38,  roadLength: 38,  elevation: 10,  avgSchooling: 6.9, industry: 75,  markets: 2, cooperatives: 3,  pdrb: 14600, hamlets: 30, distanceToCapital: 25, sawahPct: 40, aps: 79.2 },
-  { id: 6,  name: "Terara",         lat: -8.614, lng: 116.450, population: 54200,  area: 39.58,  villages: 14, male: 26500, female: 27700, density: 1370, literacy: 86.5, unemployment: 4.7, growth: 1.9, gridCol: 1, gridRow: 5, households: 14600, schoolCount: 38, healthFacility: 6,  posyandu: 29, worshipPlace: 54,  roadLength: 42,  elevation: 20,  avgSchooling: 7.2, industry: 95,  markets: 3, cooperatives: 4,  pdrb: 15800, hamlets: 44, distanceToCapital: 15, sawahPct: 48, aps: 81.6 },
-  { id: 7,  name: "Montong Gading", lat: -8.620, lng: 116.510, population: 34900,  area: 52.78,  villages: 9,  male: 17100, female: 17800, density: 661,  literacy: 81.3, unemployment: 6.3, growth: 1.3, gridCol: 3, gridRow: 5, households: 9400,  schoolCount: 24, healthFacility: 4,  posyandu: 18, worshipPlace: 36,  roadLength: 45,  elevation: 25,  avgSchooling: 6.7, industry: 60,  markets: 2, cooperatives: 2,  pdrb: 13200, hamlets: 28, distanceToCapital: 20, sawahPct: 38, aps: 76.8 },
-  { id: 8,  name: "Sikur",          lat: -8.597, lng: 116.480, population: 57800,  area: 87.05,  villages: 15, male: 28300, female: 29500, density: 664,  literacy: 85.9, unemployment: 4.8, growth: 1.7, gridCol: 2, gridRow: 5, households: 15600, schoolCount: 41, healthFacility: 7,  posyandu: 31, worshipPlace: 55,  roadLength: 58,  elevation: 30,  avgSchooling: 7.3, industry: 100, markets: 3, cooperatives: 4,  pdrb: 15400, hamlets: 46, distanceToCapital: 12, sawahPct: 42, aps: 82.1 },
-  { id: 9,  name: "Masbagik",       lat: -8.567, lng: 116.555, population: 94200,  area: 26.24,  villages: 9,  male: 46000, female: 48200, density: 3590, literacy: 91.2, unemployment: 3.4, growth: 2.8, gridCol: 3, gridRow: 4, households: 25400, schoolCount: 52, healthFacility: 9,  posyandu: 40, worshipPlace: 72,  roadLength: 32,  elevation: 18,  avgSchooling: 8.1, industry: 180, markets: 6, cooperatives: 8,  pdrb: 21200, hamlets: 62, distanceToCapital: 8,  sawahPct: 55, aps: 88.4 },
-  { id: 10, name: "Pringgasela",    lat: -8.565, lng: 116.505, population: 41300,  area: 121.68, villages: 8,  male: 20200, female: 21100, density: 339,  literacy: 83.7, unemployment: 5.6, growth: 1.5, gridCol: 2, gridRow: 4, households: 11100, schoolCount: 28, healthFacility: 5,  posyandu: 22, worshipPlace: 42,  roadLength: 65,  elevation: 45,  avgSchooling: 7.0, industry: 78,  markets: 2, cooperatives: 3,  pdrb: 14000, hamlets: 34, distanceToCapital: 14, sawahPct: 30, aps: 79.5 },
-  { id: 11, name: "Sukamulia",      lat: -8.557, lng: 116.540, population: 38400,  area: 16.32,  villages: 7,  male: 18800, female: 19600, density: 2353, literacy: 89.4, unemployment: 3.8, growth: 2.0, gridCol: 4, gridRow: 4, households: 10300, schoolCount: 25, healthFacility: 4,  posyandu: 19, worshipPlace: 38,  roadLength: 22,  elevation: 10,  avgSchooling: 7.8, industry: 85,  markets: 3, cooperatives: 3,  pdrb: 18200, hamlets: 30, distanceToCapital: 5,  sawahPct: 62, aps: 85.6 },
-  { id: 12, name: "Suralaga",       lat: -8.528, lng: 116.546, population: 47600,  area: 19.51,  villages: 10, male: 23300, female: 24300, density: 2440, literacy: 90.1, unemployment: 3.6, growth: 2.2, gridCol: 4, gridRow: 3, households: 12800, schoolCount: 32, healthFacility: 5,  posyandu: 24, worshipPlace: 46,  roadLength: 28,  elevation: 12,  avgSchooling: 7.9, industry: 98,  markets: 3, cooperatives: 4,  pdrb: 19000, hamlets: 38, distanceToCapital: 4,  sawahPct: 58, aps: 86.2 },
-  { id: 13, name: "Selong",         lat: -8.565, lng: 116.517, population: 78300,  area: 17.09,  villages: 11, male: 38200, female: 40100, density: 4581, literacy: 93.8, unemployment: 2.9, growth: 2.5, gridCol: 3, gridRow: 3, households: 21100, schoolCount: 68, healthFacility: 12, posyandu: 46, worshipPlace: 88,  roadLength: 35,  elevation: 15,  avgSchooling: 9.2, industry: 220, markets: 8, cooperatives: 12, pdrb: 28500, hamlets: 72, distanceToCapital: 0,  sawahPct: 45, aps: 92.1 },
-  { id: 14, name: "Labuhan Haji",   lat: -8.591, lng: 116.555, population: 57900,  area: 34.41,  villages: 11, male: 28300, female: 29600, density: 1683, literacy: 87.6, unemployment: 4.1, growth: 1.8, gridCol: 5, gridRow: 4, households: 15600, schoolCount: 42, healthFacility: 8,  posyandu: 35, worshipPlace: 62,  roadLength: 45,  elevation: 20,  avgSchooling: 7.6, industry: 120, markets: 4, cooperatives: 5,  pdrb: 18500, hamlets: 52, distanceToCapital: 6,  sawahPct: 48, aps: 84.2 },
-  { id: 15, name: "Pringgabaya",    lat: -8.408, lng: 116.590, population: 68200,  area: 125.35, villages: 14, male: 33400, female: 34800, density: 544,  literacy: 86.3, unemployment: 4.5, growth: 1.9, gridCol: 5, gridRow: 2, households: 18400, schoolCount: 45, healthFacility: 8,  posyandu: 36, worshipPlace: 65,  roadLength: 72,  elevation: 12,  avgSchooling: 7.5, industry: 115, markets: 4, cooperatives: 5,  pdrb: 17200, hamlets: 55, distanceToCapital: 24, sawahPct: 40, aps: 83.6 },
-  { id: 16, name: "Suela",          lat: -8.497, lng: 116.600, population: 27800,  area: 121.26, villages: 7,  male: 13600, female: 14200, density: 229,  literacy: 78.5, unemployment: 7.2, growth: 1.1, gridCol: 6, gridRow: 2, households: 7500,  schoolCount: 21, healthFacility: 4,  posyandu: 16, worshipPlace: 32,  roadLength: 68,  elevation: 80,  avgSchooling: 6.4, industry: 52,  markets: 1, cooperatives: 2,  pdrb: 11800, hamlets: 25, distanceToCapital: 30, sawahPct: 22, aps: 73.8 },
-  { id: 17, name: "Aikmel",         lat: -8.497, lng: 116.549, population: 72400,  area: 109.47, villages: 14, male: 35400, female: 37000, density: 661,  literacy: 88.9, unemployment: 4.0, growth: 2.1, gridCol: 4, gridRow: 2, households: 19500, schoolCount: 48, healthFacility: 8,  posyandu: 38, worshipPlace: 68,  roadLength: 62,  elevation: 25,  avgSchooling: 7.8, industry: 130, markets: 4, cooperatives: 6,  pdrb: 18800, hamlets: 58, distanceToCapital: 12, sawahPct: 52, aps: 85.8 },
-  { id: 18, name: "Wanasaba",       lat: -8.503, lng: 116.515, population: 60800,  area: 56.62,  villages: 12, male: 29700, female: 31100, density: 1074, literacy: 87.2, unemployment: 4.4, growth: 1.9, gridCol: 2, gridRow: 2, households: 16400, schoolCount: 42, healthFacility: 7,  posyandu: 33, worshipPlace: 60,  roadLength: 50,  elevation: 30,  avgSchooling: 7.5, industry: 108, markets: 3, cooperatives: 5,  pdrb: 17600, hamlets: 50, distanceToCapital: 10, sawahPct: 45, aps: 84.0 },
-  { id: 19, name: "Sembalun",       lat: -8.402, lng: 116.657, population: 17600,  area: 218.84, villages: 6,  male: 8600,  female: 9000,  density: 80,   literacy: 76.3, unemployment: 8.1, growth: 0.9, gridCol: 7, gridRow: 1, households: 4700,  schoolCount: 16, healthFacility: 3,  posyandu: 12, worshipPlace: 24,  roadLength: 85,  elevation: 900, avgSchooling: 6.1, industry: 38,  markets: 1, cooperatives: 2,  pdrb: 13500, hamlets: 18, distanceToCapital: 55, sawahPct: 15, aps: 71.2 },
-  { id: 20, name: "Sambelia",       lat: -8.285, lng: 116.680, population: 21900,  area: 229.77, villages: 8,  male: 10700, female: 11200, density: 95,   literacy: 77.9, unemployment: 7.6, growth: 1.0, gridCol: 7, gridRow: 0, households: 5900,  schoolCount: 18, healthFacility: 3,  posyandu: 14, worshipPlace: 28,  roadLength: 95,  elevation: 10,  avgSchooling: 6.3, industry: 45,  markets: 1, cooperatives: 2,  pdrb: 12400, hamlets: 22, distanceToCapital: 65, sawahPct: 20, aps: 72.5 },
-  { id: 21, name: "Lenek",          lat: -8.520, lng: 116.575, population: 32400,  area: 45.23,  villages: 8,  male: 15800, female: 16600, density: 716,  literacy: 84.1, unemployment: 5.3, growth: 1.6, gridCol: 5, gridRow: 3, households: 8700,  schoolCount: 22, healthFacility: 4,  posyandu: 18, worshipPlace: 35,  roadLength: 38,  elevation: 18,  avgSchooling: 7.2, industry: 65,  markets: 2, cooperatives: 3,  pdrb: 15800, hamlets: 28, distanceToCapital: 8,  sawahPct: 42, aps: 80.5 },
+  { id: 1,  name: "Keruak",         lat: -8.7509, lng: 116.5063, population: 52340,  area: 72.26,  villages: 15, male: 25800, female: 26540, density: 724,  literacy: 82.4, unemployment: 5.2, growth: 1.8, gridCol: 2, gridRow: 7, households: 14200, schoolCount: 38, healthFacility: 6,  posyandu: 28, worshipPlace: 52,  roadLength: 48,  elevation: 5,   avgSchooling: 6.8, industry: 85,  markets: 3, cooperatives: 4,  pdrb: 14200, hamlets: 42, distanceToCapital: 38, sawahPct: 35, aps: 78.2 },
+  { id: 2,  name: "Jerowaru",       lat: -8.7831, lng: 116.4727, population: 44820,  area: 147.32, villages: 11, male: 21900, female: 22920, density: 304,  literacy: 79.8, unemployment: 6.1, growth: 1.4, gridCol: 1, gridRow: 7, households: 12100, schoolCount: 29, healthFacility: 5,  posyandu: 22, worshipPlace: 44,  roadLength: 62,  elevation: 8,   avgSchooling: 6.2, industry: 68,  markets: 2, cooperatives: 3,  pdrb: 12800, hamlets: 35, distanceToCapital: 42, sawahPct: 18, aps: 74.5 },
+  { id: 3,  name: "Sakra",          lat: -8.6726, lng: 116.4871, population: 61500,  area: 30.25,  villages: 14, male: 30100, female: 31400, density: 2033, literacy: 88.1, unemployment: 4.3, growth: 2.1, gridCol: 2, gridRow: 6, households: 16600, schoolCount: 42, healthFacility: 7,  posyandu: 32, worshipPlace: 58,  roadLength: 35,  elevation: 12,  avgSchooling: 7.4, industry: 110, markets: 4, cooperatives: 5,  pdrb: 16500, hamlets: 48, distanceToCapital: 18, sawahPct: 52, aps: 83.4 },
+  { id: 4,  name: "Sakra Barat",    lat: -8.6930, lng: 116.4520, population: 43800,  area: 49.35,  villages: 12, male: 21400, female: 22400, density: 888,  literacy: 84.6, unemployment: 4.9, growth: 1.6, gridCol: 1, gridRow: 6, households: 11800, schoolCount: 31, healthFacility: 5,  posyandu: 25, worshipPlace: 46,  roadLength: 40,  elevation: 15,  avgSchooling: 7.1, industry: 90,  markets: 3, cooperatives: 3,  pdrb: 15100, hamlets: 36, distanceToCapital: 22, sawahPct: 45, aps: 80.1 },
+  { id: 5,  name: "Sakra Timur",    lat: -8.6940, lng: 116.5160, population: 37600,  area: 40.15,  villages: 10, male: 18400, female: 19200, density: 936,  literacy: 83.2, unemployment: 5.5, growth: 1.5, gridCol: 3, gridRow: 6, households: 10100, schoolCount: 26, healthFacility: 4,  posyandu: 20, worshipPlace: 38,  roadLength: 38,  elevation: 10,  avgSchooling: 6.9, industry: 75,  markets: 2, cooperatives: 3,  pdrb: 14600, hamlets: 30, distanceToCapital: 25, sawahPct: 40, aps: 79.2 },
+  { id: 6,  name: "Terara",         lat: -8.6517, lng: 116.4232, population: 54200,  area: 39.58,  villages: 14, male: 26500, female: 27700, density: 1370, literacy: 86.5, unemployment: 4.7, growth: 1.9, gridCol: 1, gridRow: 5, households: 14600, schoolCount: 38, healthFacility: 6,  posyandu: 29, worshipPlace: 54,  roadLength: 42,  elevation: 20,  avgSchooling: 7.2, industry: 95,  markets: 3, cooperatives: 4,  pdrb: 15800, hamlets: 44, distanceToCapital: 15, sawahPct: 48, aps: 81.6 },
+  { id: 7,  name: "Montong Gading", lat: -8.6010, lng: 116.4380, population: 34900,  area: 52.78,  villages: 9,  male: 17100, female: 17800, density: 661,  literacy: 81.3, unemployment: 6.3, growth: 1.3, gridCol: 3, gridRow: 5, households: 9400,  schoolCount: 24, healthFacility: 4,  posyandu: 18, worshipPlace: 36,  roadLength: 45,  elevation: 25,  avgSchooling: 6.7, industry: 60,  markets: 2, cooperatives: 2,  pdrb: 13200, hamlets: 28, distanceToCapital: 20, sawahPct: 38, aps: 76.8 },
+  { id: 8,  name: "Sikur",          lat: -8.6258, lng: 116.4365, population: 57800,  area: 87.05,  villages: 15, male: 28300, female: 29500, density: 664,  literacy: 85.9, unemployment: 4.8, growth: 1.7, gridCol: 2, gridRow: 5, households: 15600, schoolCount: 41, healthFacility: 7,  posyandu: 31, worshipPlace: 55,  roadLength: 58,  elevation: 30,  avgSchooling: 7.3, industry: 100, markets: 3, cooperatives: 4,  pdrb: 15400, hamlets: 46, distanceToCapital: 12, sawahPct: 42, aps: 82.1 },
+  { id: 9,  name: "Masbagik",       lat: -8.6231, lng: 116.4695, population: 94200,  area: 26.24,  villages: 9,  male: 46000, female: 48200, density: 3590, literacy: 91.2, unemployment: 3.4, growth: 2.8, gridCol: 3, gridRow: 4, households: 25400, schoolCount: 52, healthFacility: 9,  posyandu: 40, worshipPlace: 72,  roadLength: 32,  elevation: 18,  avgSchooling: 8.1, industry: 180, markets: 6, cooperatives: 8,  pdrb: 21200, hamlets: 62, distanceToCapital: 8,  sawahPct: 55, aps: 88.4 },
+  { id: 10, name: "Pringgasela",    lat: -8.5750, lng: 116.4950, population: 41300,  area: 121.68, villages: 8,  male: 20200, female: 21100, density: 339,  literacy: 83.7, unemployment: 5.6, growth: 1.5, gridCol: 2, gridRow: 4, households: 11100, schoolCount: 28, healthFacility: 5,  posyandu: 22, worshipPlace: 42,  roadLength: 65,  elevation: 45,  avgSchooling: 7.0, industry: 78,  markets: 2, cooperatives: 3,  pdrb: 14000, hamlets: 34, distanceToCapital: 14, sawahPct: 30, aps: 79.5 },
+  { id: 11, name: "Sukamulia",      lat: -8.6210, lng: 116.5180, population: 38400,  area: 16.32,  villages: 7,  male: 18800, female: 19600, density: 2353, literacy: 89.4, unemployment: 3.8, growth: 2.0, gridCol: 4, gridRow: 4, households: 10300, schoolCount: 25, healthFacility: 4,  posyandu: 19, worshipPlace: 38,  roadLength: 22,  elevation: 10,  avgSchooling: 7.8, industry: 85,  markets: 3, cooperatives: 3,  pdrb: 18200, hamlets: 30, distanceToCapital: 5,  sawahPct: 62, aps: 85.6 },
+  { id: 12, name: "Suralaga",       lat: -8.5830, lng: 116.5360, population: 47600,  area: 19.51,  villages: 10, male: 23300, female: 24300, density: 2440, literacy: 90.1, unemployment: 3.6, growth: 2.2, gridCol: 4, gridRow: 3, households: 12800, schoolCount: 32, healthFacility: 5,  posyandu: 24, worshipPlace: 46,  roadLength: 28,  elevation: 12,  avgSchooling: 7.9, industry: 98,  markets: 3, cooperatives: 4,  pdrb: 19000, hamlets: 38, distanceToCapital: 4,  sawahPct: 58, aps: 86.2 },
+  { id: 13, name: "Selong",         lat: -8.6500, lng: 116.5330, population: 78300,  area: 17.09,  villages: 11, male: 38200, female: 40100, density: 4581, literacy: 93.8, unemployment: 2.9, growth: 2.5, gridCol: 3, gridRow: 3, households: 21100, schoolCount: 68, healthFacility: 12, posyandu: 46, worshipPlace: 88,  roadLength: 35,  elevation: 15,  avgSchooling: 9.2, industry: 220, markets: 8, cooperatives: 12, pdrb: 28500, hamlets: 72, distanceToCapital: 0,  sawahPct: 45, aps: 92.1 },
+  { id: 14, name: "Labuhan Haji",   lat: -8.6800, lng: 116.5600, population: 57900,  area: 34.41,  villages: 11, male: 28300, female: 29600, density: 1683, literacy: 87.6, unemployment: 4.1, growth: 1.8, gridCol: 5, gridRow: 4, households: 15600, schoolCount: 42, healthFacility: 8,  posyandu: 35, worshipPlace: 62,  roadLength: 45,  elevation: 20,  avgSchooling: 7.6, industry: 120, markets: 4, cooperatives: 5,  pdrb: 18500, hamlets: 52, distanceToCapital: 6,  sawahPct: 48, aps: 84.2 },
+  { id: 15, name: "Pringgabaya",    lat: -8.5570, lng: 116.6319, population: 68200,  area: 125.35, villages: 14, male: 33400, female: 34800, density: 544,  literacy: 86.3, unemployment: 4.5, growth: 1.9, gridCol: 5, gridRow: 2, households: 18400, schoolCount: 45, healthFacility: 8,  posyandu: 36, worshipPlace: 65,  roadLength: 72,  elevation: 12,  avgSchooling: 7.5, industry: 115, markets: 4, cooperatives: 5,  pdrb: 17200, hamlets: 55, distanceToCapital: 24, sawahPct: 40, aps: 83.6 },
+  { id: 16, name: "Suela",          lat: -8.5080, lng: 116.6060, population: 27800,  area: 121.26, villages: 7,  male: 13600, female: 14200, density: 229,  literacy: 78.5, unemployment: 7.2, growth: 1.1, gridCol: 6, gridRow: 2, households: 7500,  schoolCount: 21, healthFacility: 4,  posyandu: 16, worshipPlace: 32,  roadLength: 68,  elevation: 80,  avgSchooling: 6.4, industry: 52,  markets: 1, cooperatives: 2,  pdrb: 11800, hamlets: 25, distanceToCapital: 30, sawahPct: 22, aps: 73.8 },
+  { id: 17, name: "Aikmel",         lat: -8.5610, lng: 116.5510, population: 72400,  area: 109.47, villages: 14, male: 35400, female: 37000, density: 661,  literacy: 88.9, unemployment: 4.0, growth: 2.1, gridCol: 4, gridRow: 2, households: 19500, schoolCount: 48, healthFacility: 8,  posyandu: 38, worshipPlace: 68,  roadLength: 62,  elevation: 25,  avgSchooling: 7.8, industry: 130, markets: 4, cooperatives: 6,  pdrb: 18800, hamlets: 58, distanceToCapital: 12, sawahPct: 52, aps: 85.8 },
+  { id: 18, name: "Wanasaba",       lat: -8.5580, lng: 116.5810, population: 60800,  area: 56.62,  villages: 12, male: 29700, female: 31100, density: 1074, literacy: 87.2, unemployment: 4.4, growth: 1.9, gridCol: 2, gridRow: 2, households: 16400, schoolCount: 42, healthFacility: 7,  posyandu: 33, worshipPlace: 60,  roadLength: 50,  elevation: 30,  avgSchooling: 7.5, industry: 108, markets: 3, cooperatives: 5,  pdrb: 17600, hamlets: 50, distanceToCapital: 10, sawahPct: 45, aps: 84.0 },
+  { id: 19, name: "Sembalun",       lat: -8.3791, lng: 116.5055, population: 17600,  area: 218.84, villages: 6,  male: 8600,  female: 9000,  density: 80,   literacy: 76.3, unemployment: 8.1, growth: 0.9, gridCol: 7, gridRow: 1, households: 4700,  schoolCount: 16, healthFacility: 3,  posyandu: 12, worshipPlace: 24,  roadLength: 85,  elevation: 900, avgSchooling: 6.1, industry: 38,  markets: 1, cooperatives: 2,  pdrb: 13500, hamlets: 18, distanceToCapital: 55, sawahPct: 15, aps: 71.2 },
+  { id: 20, name: "Sambelia",       lat: -8.3240, lng: 116.6660, population: 21900,  area: 229.77, villages: 8,  male: 10700, female: 11200, density: 95,   literacy: 77.9, unemployment: 7.6, growth: 1.0, gridCol: 7, gridRow: 0, households: 5900,  schoolCount: 18, healthFacility: 3,  posyandu: 14, worshipPlace: 28,  roadLength: 95,  elevation: 10,  avgSchooling: 6.3, industry: 45,  markets: 1, cooperatives: 2,  pdrb: 12400, hamlets: 22, distanceToCapital: 65, sawahPct: 20, aps: 72.5 },
+  { id: 21, name: "Lenek",          lat: -8.5630, lng: 116.5310, population: 32400,  area: 45.23,  villages: 8,  male: 15800, female: 16600, density: 716,  literacy: 84.1, unemployment: 5.3, growth: 1.6, gridCol: 5, gridRow: 3, households: 8700,  schoolCount: 22, healthFacility: 4,  posyandu: 18, worshipPlace: 35,  roadLength: 38,  elevation: 18,  avgSchooling: 7.2, industry: 65,  markets: 2, cooperatives: 3,  pdrb: 15800, hamlets: 28, distanceToCapital: 8,  sawahPct: 42, aps: 80.5 },
 ];
 
 const populationTrend = [
@@ -1139,7 +1139,7 @@ function PopulationAnalytics({
                   <div>
                     <p className="text-[10px] font-semibold text-slate-700">Luas Wilayah</p>
                     <p className="mt-1 text-2xl font-medium leading-none text-slate-900">
-                      {totalArea.toFixed(selectedDistrict ? 1 : 0)}km2
+                      {totalArea.toFixed(selectedDistrict ? 1 : 0)}<span className="text-sm text-slate-700 ml-0.5">km²</span>
                     </p>
                   </div>
                   <div className="flex h-12 items-end gap-1">
@@ -1950,7 +1950,7 @@ function LeafletMap({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<Map<number, L.CircleMarker>>(
+  const markersRef = useRef<Map<number, L.Marker>>(
     new globalThis.Map(),
   );
 
@@ -2002,21 +2002,29 @@ function LeafletMap({
 
     visible.forEach((k) => {
       const isSel = selectedId === k.id;
-      const radius = Math.max(
-        12,
-        Math.min(30, k.population / 2800),
-      );
-      const circle = L.circleMarker([k.lat, k.lng], {
-        radius,
-        fillColor: isSel
-          ? "#f59e0b"
-          : populationColor(k.population),
-        fillOpacity: isSel ? 0.9 : 0.72,
-        color: isSel ? "#d97706" : "#1d4ed8",
-        weight: isSel ? 2 : 1,
+      
+      const pinColor = isSel ? '#f59e0b' : populationColor(k.population);
+      const pinHtml = `<div style="color: ${pinColor}; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4)); transform: scale(${isSel ? '1.2' : '1.0'}); transition: transform 0.2s;">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="white" stroke-width="1">
+                           <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                           <circle cx="12" cy="10" r="3" fill="white"/>
+                         </svg>
+                       </div>`;
+                       
+      const customIcon = L.divIcon({
+        html: pinHtml,
+        className: '',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32],
+      });
+
+      const marker = L.marker([k.lat, k.lng], {
+        icon: customIcon,
+        zIndexOffset: isSel ? 1000 : 0
       }).addTo(map);
 
-      circle.bindPopup(
+      marker.bindPopup(
         `<div style="font-family:Inter,sans-serif;min-width:150px">
           <strong style="font-size:13px;color:#111">${k.name}</strong>
           <div style="font-size:11px;margin-top:4px;color:#666">
@@ -2028,8 +2036,24 @@ function LeafletMap({
         </div>`,
       );
 
-      circle.on("click", () => onSelect(k));
-      markersRef.current.set(k.id, circle);
+      marker.bindTooltip(
+        `<strong>${k.name}</strong><br/>${fmt(k.population)} jiwa`,
+        {
+          direction: "top",
+          sticky: true,
+          opacity: 0.95,
+        },
+      );
+
+      marker.on("click", () => onSelect(k));
+      markersRef.current.set(k.id, marker);
+
+      if (isSel) {
+        map.flyTo([k.lat, k.lng], Math.max(map.getZoom(), 12.4), {
+          animate: true,
+          duration: 0.75,
+        });
+      }
     });
   }, [filter, selectedId, onSelect]);
 
@@ -2055,7 +2079,7 @@ function PopulationBubbleMap({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<Map<number, L.CircleMarker>>(new globalThis.Map());
+  const markersRef = useRef<Map<number, L.Marker>>(new globalThis.Map());
   const hasFitRef = useRef(false);
   const lastSelectedRef = useRef<number | null>(null);
 
@@ -2107,17 +2131,29 @@ function PopulationBubbleMap({
 
     visible.forEach((k) => {
       const isSelected = selectedId === k.id;
-      const radius = Math.max(9, Math.min(28, k.population / 2900));
-      const circle = L.circleMarker([k.lat, k.lng], {
-        radius: isSelected ? radius + 5 : radius,
-        fillColor: populationColor(k.population),
-        fillOpacity: isSelected ? 0.92 : 0.6,
-        color: isSelected ? "#1d4ed8" : "#2563eb",
-        weight: isSelected ? 3 : 1.5,
-        opacity: 0.9,
+      
+      const pinColor = isSelected ? '#f59e0b' : populationColor(k.population);
+      const pinHtml = `<div style="color: ${pinColor}; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4)); transform: scale(${isSelected ? '1.2' : '1.0'}); transition: transform 0.2s;">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="white" stroke-width="1">
+                           <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                           <circle cx="12" cy="10" r="3" fill="white"/>
+                         </svg>
+                       </div>`;
+                       
+      const customIcon = L.divIcon({
+        html: pinHtml,
+        className: '',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32],
+      });
+
+      const marker = L.marker([k.lat, k.lng], {
+        icon: customIcon,
+        zIndexOffset: isSelected ? 1000 : 0
       }).addTo(map);
 
-      circle.bindTooltip(
+      marker.bindTooltip(
         `<strong>${k.name}</strong><br/>${fmt(k.population)} jiwa`,
         {
           direction: "top",
@@ -2126,8 +2162,8 @@ function PopulationBubbleMap({
         },
       );
 
-      circle.on("click", () => onSelect(k));
-      markersRef.current.set(k.id, circle);
+      marker.on("click", () => onSelect(k));
+      markersRef.current.set(k.id, marker);
       bounds.extend([k.lat, k.lng]);
     });
 
