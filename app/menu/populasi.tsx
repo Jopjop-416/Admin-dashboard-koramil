@@ -142,13 +142,13 @@ export default function Populasi() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari kecamatan…"
+              placeholder={viewLevel === "kecamatan" ? "Cari kecamatan…" : "Cari desa…"}
               className="w-full pl-8 pr-3 py-1.5 text-xs bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50"
             />
           </div>
           <div className="flex items-center gap-1 text-[10px] text-muted-foreground border border-border rounded-lg px-2.5 py-1.5">
             <Filter size={11} />
-            <span>{filtered.length} dari {kecamatan.length} kecamatan</span>
+            <span>{filtered.length} dari {dataSrc.length} {viewLevel === "kecamatan" ? "kecamatan" : "Desa"}</span>
           </div>
           <div className="ml-auto flex gap-2">
             <button onClick={exportCSV} className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg bg-[#217346] border border-[#217346] text-white hover:opacity-90 transition-colors">

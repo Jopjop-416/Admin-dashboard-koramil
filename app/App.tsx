@@ -1866,7 +1866,7 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow | DesaRow)
         return name.includes(q) || (!!normalizedQ && normalizeSearch(k.name).includes(normalizedQ));
       });
     },
-    [search],
+    [search, activeDataSrc],
   );
 
   const selectedDistrict = useMemo(
@@ -1975,7 +1975,7 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow | DesaRow)
   return (
     <div className="space-y-5 p-[23px]">
 
-      {/* Category selector + Search */}
+      {/* Category selector + ViewLevel toggle + Search */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex gap-1 bg-secondary rounded-md p-1 border border-border">
           {(Object.keys(CATEGORY_LABELS) as Category[]).map((cat) => (
@@ -1988,12 +1988,29 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow | DesaRow)
             </button>
           ))}
         </div>
+
+        {/* ViewLevel (Kecamatan / Desa) Toggle */}
+        <div className="flex gap-1 bg-secondary rounded-md p-1 border border-border">
+          <button
+            onClick={() => { setViewLevel("kecamatan"); setSelectedDistrictId(null); }}
+            className={"text-xs px-3.5 py-1.5 rounded-lg font-medium transition-all " + (viewLevel === "kecamatan" ? "bg-black text-white shadow-sm" : "text-muted-foreground hover:text-foreground")}
+          >
+            Kecamatan
+          </button>
+          <button
+            onClick={() => { setViewLevel("desa"); setSelectedDistrictId(null); }}
+            className={"text-xs px-3.5 py-1.5 rounded-lg font-medium transition-all " + (viewLevel === "desa" ? "bg-black text-white shadow-sm" : "text-muted-foreground hover:text-foreground")}
+          >
+            Desa
+          </button>
+        </div>
+
         <div className="relative ml-auto">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari kecamatan..."
+            placeholder={viewLevel === "kecamatan" ? "Cari kecamatan..." : "Cari desa..."}
             className="pl-8 pr-7 py-1.5 text-xs bg-card border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 w-52 transition-colors"
           />
           {search && (
@@ -2004,7 +2021,7 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow | DesaRow)
         </div>
         {search && (
           <span className={"text-[11px] px-2.5 py-1 rounded-md border " + (filteredKec.length === 0 ? "bg-red-50 border-red-200 text-red-600" : "border-border text-white bg-black")}>
-            {filteredKec.length === 0 ? "Tidak ditemukan" : filteredKec.length === 1 ? ("Kec. " + filteredKec[0].name) : (filteredKec.length + " kecamatan")}
+            {filteredKec.length === 0 ? "Tidak ditemukan" : filteredKec.length === 1 ? ((viewLevel === "desa" ? "Desa " : "Kec. ") + filteredKec[0].name) : (filteredKec.length + (viewLevel === "desa" ? " desa" : " kecamatan"))}
           </span>
         )}
       </div>
@@ -2407,7 +2424,6 @@ function MapsPage() {
               Desa
             </button>
           </div>
-
         </div>
 
         {/* Legend */}
@@ -2445,10 +2461,10 @@ function MapsPage() {
       <div className={`shrink-0 bg-card border-l border-border flex flex-col transition-all duration-300 ${selected ? 'w-[50vw]' : 'w-72'}`}>
         <div className="p-4 border-b border-border bg-card z-10 shrink-0">
           <p className="text-xs font-semibold text-foreground">
-            {selected ? "Detail Wilayah & Analisis" : "Detail Kecamatan"}
+            {selected ? "Detail Wilayah & Analisis" : viewLevel === "desa" ? "Detail Desa" : "Detail Kecamatan"}
           </p>
           <p className="text-[10px] text-muted-foreground">
-            {selected ? "Statistik komprehensif kecamatan" : "Klik penanda di peta untuk detail"}
+            {selected ? (viewLevel === "desa" ? "Statistik komprehensif desa" : "Statistik komprehensif kecamatan") : "Klik penanda di peta untuk detail"}
           </p>
         </div>
 
@@ -2462,7 +2478,7 @@ function MapsPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-foreground truncate">
-                    Kecamatan {selected.name}
+                    {viewLevel === "desa" ? `Desa ${selected.name}` : `Kecamatan ${selected.name}`}
                   </p>
                   <p className="text-[10px] text-muted-foreground truncate">
                     Lombok Timur, Nusa Tenggara Barat
@@ -2539,10 +2555,10 @@ function MapsPage() {
                 />
               </div>
               <p className="text-xs font-medium text-foreground">
-                Belum ada kecamatan dipilih
+                Belum ada {viewLevel === "desa" ? "Desa" : "kecamatan"} dipilih
               </p>
               <p className="text-[10px] text-muted-foreground mt-1 max-w-[200px]">
-                Klik salah satu lingkaran di peta untuk melihat detail informasi dan analitik wilayah.
+                Klik salah satu {viewLevel === "desa" ? "penanda" : "lingkaran"} di peta untuk melihat detail informasi dan analitik wilayah.
               </p>
             </div>
           )}
@@ -2551,10 +2567,10 @@ function MapsPage() {
           {!selected && (
             <div className="border-t border-border p-4">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                Daftar Kecamatan
+                Daftar {viewLevel === "desa" ? "Desa" : "Kecamatan"}
               </p>
               <div className="space-y-1">
-                {kecamatan.map((k) => (
+                {(viewLevel === "desa" ? desaLabuhanHaji : kecamatan).map((k) => (
                   <button
                     key={k.id}
                     onClick={() => setSelected(k)}
