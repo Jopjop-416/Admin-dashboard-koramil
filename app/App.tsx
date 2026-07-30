@@ -1,3 +1,4 @@
+import { supabase } from '../lib/supabaseClient';
 import {
   useState,
   useCallback,
@@ -8,6 +9,9 @@ import {
 import logo from "../components/asset/image/logo.png";
 import foto3 from "../components/asset/image/foto3.jpg";
 import bg1 from "../components/asset/image/bg1.jpg";
+import bg2 from "../components/asset/image/bg2.jpg";
+import bg3 from "../components/asset/image/bg 3.jpg";
+import bg4 from "../components/asset/image/bg 4.jpg";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import Populasi from "./menu/populasi";
@@ -60,6 +64,7 @@ import {
 // ─── DATA ──────────────────────────────────────────────────────────────────────
 
 export type KecamatanRow = {
+  [key: string]: any;
   id: number;
   name: string;
   lat: number;
@@ -118,7 +123,43 @@ const DEFAULT_KECAMATAN: KecamatanRow[] = [
   { id: 21, name: "Lenek",          lat: -8.5413, lng: 116.5421, population: 32400,  area: 45.23,  villages: 8,  male: 15800, female: 16600, density: 716,  literacy: 84.1, unemployment: 5.3, growth: 1.6, gridCol: 5, gridRow: 3, households: 8700,  schoolCount: 22, healthFacility: 4,  posyandu: 18, worshipPlace: 35,  roadLength: 38,  elevation: 18,  avgSchooling: 7.2, industry: 65,  markets: 2, cooperatives: 3,  pdrb: 15800, hamlets: 28, distanceToCapital: 8,  sawahPct: 42, aps: 80.5 },
 ];
 
-export const kecamatan = [...DEFAULT_KECAMATAN];
+export const kecamatan: KecamatanRow[] = [];
+
+export type DesaRow = {
+  [key: string]: any;
+  id: number;
+  name: string;
+  lat: number;
+  lng: number;
+  population: number;
+  area: number;
+  male: number;
+  female: number;
+  density: number;
+  literacy: number;
+  unemployment: number;
+  growth: number;
+  households: number;
+  schoolCount: number;
+  healthFacility: number;
+  posyandu: number;
+  worshipPlace: number;
+  roadLength: number;
+  elevation: number;
+  avgSchooling: number;
+  industry: number;
+  markets: number;
+  cooperatives: number;
+  pdrb: number;
+  hamlets: number;
+  distanceToCapital: number;
+  sawahPct: number;
+  aps: number;
+  bpd: number;
+  bpr: number;
+};
+export const desaLabuhanHaji: DesaRow[] = [];
+
 
 try {
   const saved = localStorage.getItem("kecamatan_coords");
@@ -1119,10 +1160,10 @@ function PopulationAnalytics({
   onClearFocus,
   hideMapAndFocus,
 }: {
-  D: KecamatanRow[];
+  D: any[];
   scaleFactor: number;
-  onDistrict: (k: KecamatanRow) => void;
-  selectedDistrict: KecamatanRow | null;
+  onDistrict: (k: any) => void;
+  selectedDistrict: any | null;
   onClearFocus: () => void;
   hideMapAndFocus?: boolean;
 }) {
@@ -1470,7 +1511,7 @@ function PopulationAnalytics({
 
 // ─── GEOGRAFIS ANALYTICS ──────────────────────────────────────────────────────
 
-function GeografisAnalytics({ D }: { D: KecamatanRow[] }) {
+function GeografisAnalytics({ D }: { D: any[] }) {
   const n = D.length || 1;
   const avgSawah  = D.reduce((s, k) => s + k.sawahPct, 0) / n;
   const totalArea = D.reduce((s, k) => s + k.area, 0);
@@ -1578,7 +1619,7 @@ function GeografisAnalytics({ D }: { D: KecamatanRow[] }) {
 
 // ─── EKONOMI ANALYTICS ────────────────────────────────────────────────────────
 
-function EkonomiAnalytics({ D }: { D: KecamatanRow[] }) {
+function EkonomiAnalytics({ D }: { D: any[] }) {
   const n = D.length || 1;
   const avgPdrb = Math.round(D.reduce((s, k) => s + k.pdrb, 0) / n);
 
@@ -1687,7 +1728,7 @@ function EkonomiAnalytics({ D }: { D: KecamatanRow[] }) {
 
 // ─── SOSIAL ANALYTICS ─────────────────────────────────────────────────────────
 
-function SosialAnalytics({ D }: { D: KecamatanRow[] }) {
+function SosialAnalytics({ D }: { D: any[] }) {
   const n = D.length || 1;
   const avgLit = D.reduce((s, k) => s + k.literacy, 0) / n;
   const avgAps = D.reduce((s, k) => s + k.aps, 0) / n;
@@ -1806,18 +1847,21 @@ const CATEGORY_LABELS: Record<Category, string> = {
   sosial:    "Sosial",
 };
 
-function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }) {
+function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow | DesaRow) => void }) {
   const [category, setCategory] = useState<Category>("penduduk");
   const [search, setSearch]     = useState("");
   const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
+  const [viewLevel, setViewLevel] = useState<"kecamatan" | "desa">("kecamatan");
+  
+  const activeDataSrc = viewLevel === "kecamatan" ? kecamatan : desaLabuhanHaji;
 
   const filteredKec = useMemo(
     () => {
       const q = search.trim().toLowerCase();
       const normalizedQ = normalizeSearch(search);
-      if (!q) return kecamatan;
+      if (!q) return activeDataSrc;
 
-      return kecamatan.filter((k) => {
+      return activeDataSrc.filter((k) => {
         const name = k.name.toLowerCase();
         return name.includes(q) || (!!normalizedQ && normalizeSearch(k.name).includes(normalizedQ));
       });
@@ -1826,8 +1870,8 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }
   );
 
   const selectedDistrict = useMemo(
-    () => kecamatan.find((k) => k.id === selectedDistrictId) ?? null,
-    [selectedDistrictId],
+    () => activeDataSrc.find((k) => k.id === selectedDistrictId) ?? null,
+    [selectedDistrictId, activeDataSrc],
   );
 
   useEffect(() => {
@@ -1838,16 +1882,16 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }
     }
 
     const normalizedQ = normalizeSearch(search);
-    const exact = kecamatan.find(
+    const exact = activeDataSrc.find(
       (k) => k.name.toLowerCase() === q || (!!normalizedQ && normalizeSearch(k.name) === normalizedQ),
     );
-    const matches = kecamatan.filter((k) =>
+    const matches = activeDataSrc.filter((k) =>
       k.name.toLowerCase().includes(q) || (!!normalizedQ && normalizeSearch(k.name).includes(normalizedQ)),
     );
     const next = exact ?? (matches.length === 1 ? matches[0] : null);
 
     setSelectedDistrictId((prev) => (next ? next.id : prev === null ? prev : null));
-  }, [search]);
+  }, [search, activeDataSrc]);
 
   const D = filteredKec;
   const statRows = selectedDistrict ? [selectedDistrict] : filteredKec;
@@ -1857,7 +1901,7 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }
   const totalMale      = statRows.reduce((s, k) => s + k.male, 0);
   const totalFemale    = statRows.reduce((s, k) => s + k.female, 0);
   const totalArea      = statRows.reduce((s, k) => s + k.area, 0);
-  const totalVillages  = statRows.reduce((s, k) => s + k.villages, 0);
+  const totalVillages  = statRows.reduce((s, k) => s + ((k as any).villages || 0), 0);
   const totalHH        = statRows.reduce((s, k) => s + k.households, 0);
   const totalSchools   = statRows.reduce((s, k) => s + k.schoolCount, 0);
   const totalHealth    = statRows.reduce((s, k) => s + k.healthFacility, 0);
@@ -1895,7 +1939,7 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }
       { icon: <Users size={17} />,      label: "Usia Produktif 15–64", value: fmtK(Math.round(totalPop * 0.659)),   sub: "65.9% dari total penduduk",                                 color: "bg-indigo-50", iconColor: "text-indigo-600" },
     ],
     geografis: [
-      { icon: <Map size={17} />,        label: "Luas Wilayah Total",     value: totalArea.toFixed(0) + " km²",        sub: "Wilayah yang dipilih",               color: "bg-green-50",  iconColor: "text-green-600"  },
+      { icon: <Map size={17} />,        label: "Luas Wilayah Total",     value: totalArea.toFixed(0) + " km²",        sub: "Wilayah yang dipilih",               color: "bg-green-50",  iconColor: "text-green-600", bgImage: bg2 },
       { icon: <Building2 size={17} />,  label: "Jumlah Desa/Kel.",       value: String(totalVillages),                     sub: "Desa dan kelurahan aktif",           color: "bg-teal-50",   iconColor: "text-teal-600"   },
       { icon: <MapPin size={17} />,     label: "Jumlah Dusun",           value: String(totalHamlets),                      sub: "Dusun/lingkungan",                   color: "bg-sky-50",    iconColor: "text-sky-600"    },
       { icon: <Activity size={17} />,   label: "Panjang Jalan",          value: totalRoad.toFixed(0) + " km",              sub: "Total jaringan jalan",               color: "bg-blue-50",   iconColor: "text-blue-600"   },
@@ -1905,7 +1949,7 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }
       { icon: <Activity size={17} />,   label: "Kepadatan Penduduk",     value: fmt(avgDensity) + "/km²",             sub: "Jiwa per km persegi",                color: "bg-rose-50",   iconColor: "text-rose-500"   },
     ],
     ekonomi: [
-      { icon: <Briefcase size={17} />,  label: "Tingkat Pengangguran",   value: avgUnemp + "%",                            sub: "Rata-rata kecamatan 2024",           color: "bg-red-50",    iconColor: "text-red-500"    },
+      { icon: <Briefcase size={17} />,  label: "Tingkat Pengangguran",   value: avgUnemp + "%",                            sub: "Rata-rata kecamatan 2024",           color: "bg-red-50",    iconColor: "text-red-500", bgImage: bg3 },
       { icon: <TrendingUp size={17} />, label: "PDRB Per Kapita",        value: "Rp " + fmtK(avgPdrb * 1000),             sub: "Rata-rata per kapita / tahun",       color: "bg-green-50",  iconColor: "text-green-600", trend: 3.2 },
       { icon: <Building2 size={17} />,  label: "Jumlah Pasar",           value: String(totalMarkets),                      sub: "Pasar tradisional & modern",         color: "bg-amber-50",  iconColor: "text-amber-600"  },
       { icon: <Layers size={17} />,     label: "Industri Kecil/RT",      value: String(totalIndustry),                     sub: "Usaha industri rumahan",             color: "bg-orange-50", iconColor: "text-orange-600" },
@@ -1915,7 +1959,7 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }
       { icon: <TrendingUp size={17} />, label: "Pertumbuhan Ekonomi",    value: "+5.2%",                                   sub: "PDRB riil 2023–2024",           color: "bg-teal-50",   iconColor: "text-teal-600",  trend: 5.2 },
     ],
     sosial: [
-      { icon: <GraduationCap size={17} />, label: "Melek Huruf",         value: avgLiteracy + "%",                         sub: "Rata-rata kecamatan",                color: "bg-violet-50", iconColor: "text-violet-600", trend: 0.8 },
+      { icon: <GraduationCap size={17} />, label: "Melek Huruf",         value: avgLiteracy + "%",                         sub: "Rata-rata kecamatan",                color: "bg-violet-50", iconColor: "text-violet-600", trend: 0.8, bgImage: bg4 },
       { icon: <GraduationCap size={17} />, label: "Rata-rata Lama Sekolah", value: avgSchool + " thn",                    sub: "Mean years of schooling",            color: "bg-blue-50",   iconColor: "text-blue-600"   },
       { icon: <Building2 size={17} />,  label: "Jumlah Sekolah",         value: String(totalSchools),                      sub: "SD + SMP + SMA/K sederajat",         color: "bg-sky-50",    iconColor: "text-sky-600",   trend: 0.3 },
       { icon: <Heart size={17} />,      label: "Fasilitas Kesehatan",    value: String(totalHealth),                       sub: "Puskesmas + Pustu aktif",            color: "bg-rose-50",   iconColor: "text-rose-500"   },
@@ -2002,16 +2046,20 @@ function DashboardPage({ onDistrict }: { onDistrict: (k: KecamatanRow) => void }
   );
 }
 
+
+
 // ─── VANILLA LEAFLET MAP ──────────────────────────────────────────────────────
 
 function LeafletMap({
   filter,
   selectedId,
   onSelect,
+  viewLevel = "kecamatan",
 }: {
   filter: "all" | "padat" | "jarang";
   selectedId: number | null;
-  onSelect: (k: KecamatanRow) => void;
+  onSelect: (k: any) => void;
+  viewLevel?: "kecamatan" | "desa";
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -2059,17 +2107,22 @@ function LeafletMap({
     markersRef.current.forEach((m) => m.remove());
     markersRef.current.clear();
 
-    const visible = kecamatan.filter((k) => {
+    const activeDataSrc = viewLevel === "kecamatan" ? kecamatan : desaLabuhanHaji;
+    const visible = activeDataSrc.filter((k) => {
       if (filter === "padat") return k.density > 500;
       if (filter === "jarang") return k.density <= 500;
       return true;
     });
 
+    const bounds = L.latLngBounds([]);
+    let hasSelected = false;
+
     visible.forEach((k) => {
       const isSel = selectedId === k.id;
+      if (isSel) hasSelected = true;
       
       const pinColor = isSel ? '#f59e0b' : populationColor(k.population);
-      const pinHtml = `<div style="color: ${pinColor}; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4)); transform: scale(${isSel ? '1.2' : '1.0'}); transition: transform 0.2s;">
+      const pinHtml = `<div style="color: ${pinColor}; transform: scale(${isSel ? '1.2' : '1.0'}); transition: transform 0.2s;">
                          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="white" stroke-width="1">
                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
                            <circle cx="12" cy="10" r="3" fill="white"/>
@@ -2092,7 +2145,9 @@ function LeafletMap({
 
       marker.on("dragend", (e) => {
         const latlng = e.target.getLatLng();
-        updateKecamatanCoord(k.id, latlng.lat, latlng.lng);
+        if (viewLevel === "kecamatan") {
+          updateKecamatanCoord(k.id, latlng.lat, latlng.lng);
+        }
       });
 
       marker.bindPopup(
@@ -2119,6 +2174,10 @@ function LeafletMap({
       marker.on("click", () => onSelect(k));
       markersRef.current.set(k.id, marker);
 
+      if (k.lat && k.lng) {
+        bounds.extend([k.lat, k.lng]);
+      }
+
       if (isSel) {
         map.flyTo([k.lat, k.lng], Math.max(map.getZoom(), 12.4), {
           animate: true,
@@ -2126,7 +2185,11 @@ function LeafletMap({
         });
       }
     });
-  }, [filter, selectedId, onSelect]);
+
+    if (!hasSelected && bounds.isValid()) {
+      map.flyToBounds(bounds.pad(0.18), { animate: true, duration: 0.75 });
+    }
+  }, [filter, selectedId, onSelect, viewLevel]);
 
   return (
     <div
@@ -2204,7 +2267,7 @@ function PopulationBubbleMap({
       const isSelected = selectedId === k.id;
       
       const pinColor = isSelected ? '#f59e0b' : populationColor(k.population);
-      const pinHtml = `<div style="color: ${pinColor}; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4)); transform: scale(${isSelected ? '1.2' : '1.0'}); transition: transform 0.2s;">
+      const pinHtml = `<div style="color: ${pinColor}; transform: scale(${isSelected ? '1.2' : '1.0'}); transition: transform 0.2s;">
                          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="white" stroke-width="1">
                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
                            <circle cx="12" cy="10" r="3" fill="white"/>
@@ -2303,16 +2366,17 @@ function PopulationBubbleMap({
 // ─── MAPS PAGE ────────────────────────────────────────────────────────────────
 
 function MapsPage() {
-  const [selected, setSelected] = useState<KecamatanRow | null>(
+  const [selected, setSelected] = useState<KecamatanRow | DesaRow | null>(
     null,
   );
   const [filter, setFilter] = useState<
     "all" | "padat" | "jarang"
   >("all");
   const [category, setCategory] = useState<Category>("penduduk");
+  const [viewLevel, setViewLevel] = useState<"kecamatan" | "desa">("kecamatan");
 
   const handleSelect = useCallback(
-    (k: KecamatanRow) => setSelected(k),
+    (k: KecamatanRow | DesaRow) => setSelected(k),
     [],
   );
 
@@ -2324,28 +2388,26 @@ function MapsPage() {
           filter={filter}
           selectedId={selected?.id ?? null}
           onSelect={handleSelect}
+          viewLevel={viewLevel}
         />
 
         {/* Filter overlay */}
         <div className="absolute top-4 left-4 z-[1000] flex gap-1 pointer-events-auto">
-          {(["all", "padat", "jarang"] as const).map((f) => (
+          <div className="flex gap-1 bg-secondary rounded-md p-1 border border-border shadow-lg" style={{ backdropFilter: "blur(8px)" }}>
             <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`text-[11px] px-3 py-1.5 rounded-full font-medium border transition-colors shadow-lg ${
-                filter === f
-                  ? "bg-primary text-white border-primary"
-                  : "bg-card/90 text-foreground border-border hover:border-primary/50"
-              }`}
-              style={{ backdropFilter: "blur(8px)" }}
+              onClick={() => { setViewLevel("kecamatan"); setSelected(null); }}
+              className={"text-[11px] px-3 py-1.5 rounded-lg font-medium transition-all " + (viewLevel === "kecamatan" ? "bg-black text-white shadow-sm" : "text-muted-foreground hover:text-foreground")}
             >
-              {f === "all"
-                ? "Semua"
-                : f === "padat"
-                  ? "Padat (>500/km²)"
-                  : "Jarang (≤500/km²)"}
+              Kecamatan
             </button>
-          ))}
+            <button
+              onClick={() => { setViewLevel("desa"); setSelected(null); }}
+              className={"text-[11px] px-3 py-1.5 rounded-lg font-medium transition-all " + (viewLevel === "desa" ? "bg-black text-white shadow-sm" : "text-muted-foreground hover:text-foreground")}
+            >
+              Desa
+            </button>
+          </div>
+
         </div>
 
         {/* Legend */}
@@ -2900,11 +2962,47 @@ const PAGE_META: Record<
 export default function App() {
   const [page, setPage] = useState<Page>("dashboard");
   const [modal, setModal] = useState<KecamatanRow | null>(null);
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  useEffect(() => {
+    async function loadData() {
+      const { data: kecData } = await supabase.from('kecamatan').select('*');
+      const { data: desaData } = await supabase.from('desa').select('*');
+
+      const toCamel = (obj: any) => {
+        if (!obj || typeof obj !== 'object') return obj;
+        const newObj: any = {};
+        for (const key in obj) {
+          const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+          newObj[camelKey] = obj[key];
+        }
+        return newObj;
+      };
+
+      if (kecData && kecData.length > 0) {
+        kecamatan.length = 0;
+        const mapped = kecData.map(toCamel).map((k: any) => {
+          const def = DEFAULT_KECAMATAN.find(d => d.name === k.name);
+          return { ...k, color: def?.color, gridCol: def?.gridCol, gridRow: def?.gridRow };
+        });
+        kecamatan.push(...mapped);
+      }
+      
+      if (desaData && desaData.length > 0) {
+        desaLabuhanHaji.length = 0;
+        desaLabuhanHaji.push(...desaData.map(toCamel));
+      }
+      setDataLoaded(true);
+    }
+    loadData();
+  }, []);
 
   const handleDistrict = useCallback(
-    (k: KecamatanRow) => setModal(k),
+    (k: KecamatanRow | DesaRow) => setModal(k as any),
     [],
   );
+
+  if (!dataLoaded) return <div className="flex h-screen items-center justify-center bg-background"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div

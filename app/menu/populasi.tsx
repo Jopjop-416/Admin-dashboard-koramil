@@ -1,25 +1,30 @@
 import React, { useState } from "react";
 import { Search, Filter, Download, Users, TrendingUp, Activity } from "lucide-react";
-import { kecamatan, KecamatanRow, fmt, fmtK } from "../App";
+import { kecamatan, KecamatanRow, desaLabuhanHaji, DesaRow, fmt, fmtK } from "../App";
 
 export default function Populasi() {
+  const [viewLevel, setViewLevel] = useState<"kecamatan" | "desa">("kecamatan");
   const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState<keyof KecamatanRow>("population");
+  const [sortKey, setSortKey] = useState<string>("population");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-  const filtered = kecamatan
+  const dataSrc = viewLevel === "kecamatan" ? kecamatan : desaLabuhanHaji;
+
+  const filtered = [...dataSrc]
     .filter((k) => k.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
-      const va = a[sortKey] as number;
-      const vb = b[sortKey] as number;
+      const va = (a as any)[sortKey] as number;
+      const vb = (b as any)[sortKey] as number;
       return sortDir === "asc" ? va - vb : vb - va;
     });
 
-  const totalPop = kecamatan.reduce((s, k) => s + k.population, 0);
-  const avgDensity = Math.round(kecamatan.reduce((s, k) => s + k.density, 0) / kecamatan.length);
-  const avgGrowth = (kecamatan.reduce((s, k) => s + k.growth, 0) / kecamatan.length).toFixed(1);
+  const totalPop = dataSrc.reduce((s, k) => s + k.population, 0);
+  const avgDensity = Math.round(dataSrc.reduce((s, k) => s + k.density, 0) / dataSrc.length);
+  const thirdMetric = viewLevel === "kecamatan" 
+    ? (kecamatan.reduce((s, k) => s + k.growth, 0) / kecamatan.length).toFixed(1) + "%"
+    : (desaLabuhanHaji.reduce((s, k) => s + k.sexRatio, 0) / desaLabuhanHaji.length).toFixed(0);
 
-  function toggleSort(key: keyof KecamatanRow) {
+  function toggleSort(key: string) {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else {
       setSortKey(key);
@@ -28,16 +33,26 @@ export default function Populasi() {
   }
 
   function exportCSV() {
-    const header = ["No", "Kecamatan", "Penduduk", "Laki-laki", "Perempuan", "Kepadatan/km²", "Jml KK", "Laju (%)"];
-    const rows = kecamatan.map((k, i) => [
-      i + 1, k.name, k.population, k.male, k.female, k.density, k.households, k.growth
-    ]);
+    // Basic export for now, can be adjusted based on viewLevel
+    const header = viewLevel === "kecamatan" 
+      ? ["No", "Kecamatan", "Penduduk", "Laki-laki", "Perempuan", "Kepadatan/km²", "Jml KK", "Laju (%)"]
+      : ["No", "Desa/Kelurahan", "Penduduk", "Laki-laki", "Perempuan", "Persentase", "Kepadatan/km²", "Rasio Jenis Kelamin"];
+    
+    const rows = filtered.map((k, i) => {
+      if (viewLevel === "kecamatan") {
+        const kec = k as KecamatanRow;
+        return [i + 1, kec.name, kec.population, kec.male, kec.female, kec.density, kec.households, kec.growth];
+      } else {
+        const desa = k as DesaRow;
+        return [i + 1, desa.name, desa.population, desa.male, desa.female, desa.populationPercentage, desa.density, desa.sexRatio];
+      }
+    });
     const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "data-populasi-lotim-2024.csv";
+    a.download = `data-populasi-${viewLevel}-2024.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -46,18 +61,47 @@ export default function Populasi() {
     window.print();
   }
 
-  const cols: { key: keyof KecamatanRow; label: string; fmt: (k: KecamatanRow) => React.ReactNode }[] = [
-    { key: "name", label: "Kecamatan", fmt: (k) => k.name },
-    { key: "population", label: "Penduduk", fmt: (k) => fmt(k.population) },
-    { key: "male", label: "Laki-laki", fmt: (k) => fmt(k.male) },
-    { key: "female", label: "Perempuan", fmt: (k) => fmt(k.female) },
-    { key: "density", label: "Kepadatan/km²", fmt: (k) => fmt(k.density) },
-    { key: "households", label: "Jml KK", fmt: (k) => fmt(k.households) },
-    { key: "growth", label: "Laju (%)", fmt: (k) => <span className={k.growth >= 2 ? "text-green-600 font-semibold" : "text-muted-foreground"}>{k.growth.toFixed(1)}%</span> },
+  const colsKecamatan: { key: string; label: string; fmt: (k: any) => React.ReactNode }[] = [
+    { key: "name", label: "Kecamatan", fmt: (k: KecamatanRow) => k.name },
+    { key: "population", label: "Penduduk", fmt: (k: KecamatanRow) => fmt(k.population) },
+    { key: "male", label: "Laki-laki", fmt: (k: KecamatanRow) => fmt(k.male) },
+    { key: "female", label: "Perempuan", fmt: (k: KecamatanRow) => fmt(k.female) },
+    { key: "density", label: "Kepadatan/km²", fmt: (k: KecamatanRow) => fmt(k.density) },
+    { key: "households", label: "Jml KK", fmt: (k: KecamatanRow) => fmt(k.households) },
+    { key: "growth", label: "Laju (%)", fmt: (k: KecamatanRow) => <span className={k.growth >= 2 ? "text-green-600 font-semibold" : "text-muted-foreground"}>{k.growth.toFixed(1)}%</span> },
   ];
+
+  const colsDesa: { key: string; label: string; fmt: (k: any) => React.ReactNode }[] = [
+    { key: "name", label: "Desa/Kelurahan", fmt: (k: DesaRow) => k.name },
+    { key: "population", label: "Jumlah", fmt: (k: DesaRow) => fmt(k.population) },
+    { key: "male", label: "Laki-Laki", fmt: (k: DesaRow) => fmt(k.male) },
+    { key: "female", label: "Perempuan", fmt: (k: DesaRow) => fmt(k.female) },
+    { key: "populationPercentage", label: "Persentase (%)", fmt: (k: DesaRow) => k.populationPercentage.toFixed(2) + "%" },
+    { key: "density", label: "Kepadatan/km²", fmt: (k: DesaRow) => fmt(k.density) },
+    { key: "sexRatio", label: "Rasio J. Kelamin", fmt: (k: DesaRow) => String(k.sexRatio) },
+  ];
+
+  const cols = viewLevel === "kecamatan" ? colsKecamatan : colsDesa;
 
   return (
     <div className="px-6 pt-4 pb-6 space-y-5">
+      {/* View Toggle */}
+      <div className="flex gap-1 bg-secondary rounded-md p-1 border border-border w-fit">
+        {(["kecamatan", "desa"] as const).map((level) => (
+          <button
+            key={level}
+            onClick={() => {
+              setViewLevel(level);
+              setSortKey(level === "kecamatan" ? "population" : "population");
+              setSearch("");
+            }}
+            className={"text-xs px-3.5 py-1.5 rounded-lg font-medium transition-all capitalize " + (viewLevel === level ? "bg-black text-white shadow-sm" : "text-muted-foreground hover:text-foreground")}
+          >
+            {level}
+          </button>
+        ))}
+      </div>
+
       {/* Summary row */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4">
@@ -66,7 +110,7 @@ export default function Populasi() {
           </div>
           <div>
             <p className="text-lg font-semibold font-sans text-foreground">{fmtK(totalPop)}</p>
-            <p className="text-[10px] text-muted-foreground">Total Penduduk</p>
+            <p className="text-[10px] text-muted-foreground">Total Penduduk {viewLevel === "kecamatan" ? "Lombok Timur" : "Labuhan Haji"}</p>
           </div>
         </div>
         <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4">
@@ -83,8 +127,8 @@ export default function Populasi() {
             <TrendingUp size={17} className="text-emerald-500" />
           </div>
           <div>
-            <p className="text-lg font-semibold font-sans text-foreground">+{avgGrowth}%</p>
-            <p className="text-[10px] text-muted-foreground">Rata-rata Pertumbuhan</p>
+            <p className="text-lg font-semibold font-sans text-foreground">{viewLevel === "kecamatan" ? "+" : ""}{thirdMetric}</p>
+            <p className="text-[10px] text-muted-foreground">{viewLevel === "kecamatan" ? "Rata-rata Pertumbuhan" : "Rata-rata Rasio Jenis Kelamin"}</p>
           </div>
         </div>
       </div>
